@@ -28,11 +28,11 @@ export default function AstroWizard() {
           <h1>The Stargazer's Telescope &amp; Gear Wizard</h1>
           <p className="lede">Answer 4 quick questions. We'll design the perfect telescope build — optical tube, mount, eyepieces, filters, dark-sky essentials — with vendor links tuned to your budget.</p>
           <div className="intro-features">
-            <span>\u2726 Live observation deck</span>
-            <span>\u2726 Rules-driven kit engine</span>
-            <span>\u2726 Beginner-safe defaults</span>
+            <span>✦ Live observation deck</span>
+            <span>✦ Rules-driven kit engine</span>
+            <span>✦ Beginner-safe defaults</span>
           </div>
-          <button className="start-btn" onClick={() => setStarted(true)}>Begin your build \u2192</button>
+          <button className="start-btn" onClick={() => setStarted(true)}>Begin your build →</button>
         </div>
       </div>
     );
@@ -71,15 +71,15 @@ export default function AstroWizard() {
                     <span className="opt-label">{opt.label}</span>
                     <span className="opt-sub">{opt.sub}</span>
                   </span>
-                  <span className="opt-arrow">\u2192</span>
+                  <span className="opt-arrow">→</span>
                 </button>
               ))}
             </div>
 
             <div className="wq-nav">
-              <button className="btn ghost" onClick={() => setStep(Math.max(0, step - 1))} disabled={step === 0}>\u2190 Back</button>
+              <button className="btn ghost" onClick={() => setStep(Math.max(0, step - 1))} disabled={step === 0}>← Back</button>
               <button className="btn ghost" onClick={resetAll}>Reset</button>
-              <button className="btn ghost" onClick={() => setStep(Math.min(QUESTIONS.length - 1, step + 1))} disabled={step === QUESTIONS.length - 1 || !answers[q.id]}>Next \u2192</button>
+              <button className="btn ghost" onClick={() => setStep(Math.min(QUESTIONS.length - 1, step + 1))} disabled={step === QUESTIONS.length - 1 || !answers[q.id]}>Next →</button>
             </div>
           </div>
 
@@ -127,7 +127,7 @@ export default function AstroWizard() {
               <div className="bundle-title">Preferred Vendor for Your Tier</div>
               <div className="bundle-vendor">{kit.vendor}</div>
               <a className="bundle-btn" href={vendorLink(kit.vendor)} target="_blank" rel="nofollow noopener sponsored">
-                Open {kit.vendor} \u2192
+                Open {kit.vendor} →
               </a>
               <div className="bundle-note">Cards below deep-link into each product on your preferred marketplace.</div>
             </div>
@@ -172,7 +172,7 @@ function ChecklistSection({ title, ids, tone }) {
                 {it.spec && <div className="cs-spec">{it.spec}</div>}
               </div>
               <div className="cs-price">${it.price}</div>
-              <a className="cs-link" href={it.url} target="_blank" rel="nofollow noopener sponsored">{it.vendor} \u2192</a>
+              <a className="cs-link" href={it.url} target="_blank" rel="nofollow noopener sponsored">{it.vendor} →</a>
             </div>
           );
         })}

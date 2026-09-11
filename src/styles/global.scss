@@ -2167,3 +2167,114 @@ ul, ol { list-style: none; }
   from { transform: rotate(0deg); }
   to { transform: rotate(360deg); }
 }
+
+/* Astronomy — refined animation additions */
+.obs-deck {
+  .obs-toolbar .obs-tools {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+
+    .obs-badge {
+      font-family: 'JetBrains Mono', ui-monospace, monospace;
+      font-size: 0.55rem;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: #38BDF8;
+      background: rgba(56, 189, 248, 0.08);
+      border: 1px solid rgba(56, 189, 248, 0.2);
+      border-radius: 4px;
+      padding: 0.18rem 0.45rem;
+    }
+  }
+
+  .obs-canvas {
+    .nebula-pulse { animation: nebula-pulse 6s ease-in-out infinite; transform-origin: center; }
+    .drift-slow { animation: drift-slow 22s ease-in-out infinite alternate; transform-origin: center; }
+    .beam { animation: beam-flicker 3.5s ease-in-out infinite; }
+    .shooter-wrap .shooter {
+      animation: shooter 1.4s ease-out forwards;
+      opacity: 0;
+    }
+    .track-dot { filter: drop-shadow(0 0 3px rgba(16, 185, 129, 0.7)); }
+  }
+
+  .obs-disclosure {
+    font-size: 0.68rem;
+    color: #64748b;
+    text-align: center;
+    line-height: 1.4;
+    padding: 0.6rem 0.4rem 0.1rem;
+    border-top: 1px solid rgba(56, 189, 248, 0.08);
+  }
+}
+
+@keyframes drift-slow {
+  from { transform: translateX(0); }
+  to { transform: translateX(8px); }
+}
+@keyframes beam-flicker {
+  0%, 100% { opacity: 0.75; }
+  40% { opacity: 0.35; }
+  50% { opacity: 0.8; }
+}
+@keyframes shooter {
+  0% { opacity: 0; transform: translate(20px, -20px); }
+  15% { opacity: 1; }
+  100% { opacity: 0; transform: translate(-120px, 80px); }
+}
+
+/* Chemistry — refined animation additions */
+.lab-preview {
+  .lab-preview-toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    .lab-tools {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+
+      .lab-badge {
+        font-family: 'JetBrains Mono', ui-monospace, monospace;
+        font-size: 0.55rem;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+        color: #38BDF8;
+        background: rgba(56, 189, 248, 0.08);
+        border: 1px solid rgba(56, 189, 248, 0.2);
+        border-radius: 4px;
+        padding: 0.18rem 0.45rem;
+      }
+    }
+  }
+
+  .lab-canvas {
+    .flame-flicker {
+      animation: flame-flicker 0.35s ease-in-out infinite alternate;
+      transform-origin: center bottom;
+    }
+    .spin-bar {
+      animation: spin-slow 0.4s linear infinite;
+    }
+    .steam {
+      animation: steam-rise 4.2s ease-out infinite;
+      opacity: 0;
+    }
+    .steam-group { pointer-events: none; }
+  }
+}
+
+@keyframes flame-flicker {
+  0% { transform: scaleY(1) scaleX(1); opacity: 0.85; }
+  25% { transform: scaleY(1.08) scaleX(0.94); opacity: 1; }
+  50% { transform: scaleY(0.96) scaleX(1.06); opacity: 0.9; }
+  75% { transform: scaleY(1.04) scaleX(0.97); opacity: 0.95; }
+  100% { transform: scaleY(1) scaleX(1); opacity: 0.85; }
+}
+@keyframes steam-rise {
+  0% { opacity: 0; transform: translateY(0) scale(0.8); }
+  20% { opacity: 0.7; }
+  100% { opacity: 0; transform: translateY(-30px) scale(1.4); }
+}

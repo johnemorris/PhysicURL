@@ -116,14 +116,16 @@ export function computeKit({ target, environment, experience, budget }) {
   }
 
   // ===== Mount selection =====
+  // Backcountry always forces the ultra-portable field tripod (per master prompt).
+  // For astrophotography in the backcountry, also add a compact tracker note.
   if (environment === 'backcountry') {
     out.mount.push('mount_field');
+    if (target === 'astrophoto') {
+      out.banners.push('Backcountry astrophotography: pack a compact star tracker (e.g. Sky-Watcher Star Adventurer) — a full EQ mount will not fit a backpack build.');
+    }
   } else if (target === 'astrophoto' || experience === 'advanced') {
     if (budget === 'elite') out.mount.push('mount_eq_advanced');
     else out.mount.push('mount_eq_goto');
-  } else if (experience === 'beginner' || environment === 'backyard') {
-    if (experience === 'intermediate') out.mount.push('mount_az_goto');
-    else out.mount.push('mount_az_basic');
   } else if (experience === 'intermediate') {
     out.mount.push('mount_az_goto');
   } else {
