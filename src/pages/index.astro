@@ -127,7 +127,7 @@ const freeCount = resources.filter(r => r.access === 'free' || r.access === 'ope
     const type = filterType.value;
     const verified = filterVerified.value;
     const sort = sortSelect.value;
-    let visible = 0;
+    let visibleCount = 0;
 
     rows.forEach(row => {
       const matchAccess = access === 'all' || row.dataset.access === access;
@@ -135,7 +135,7 @@ const freeCount = resources.filter(r => r.access === 'free' || r.access === 'ope
       const matchVerified = verified === 'all' || (verified === 'verified' && row.dataset.verified === 'true');
       const visible = matchAccess && matchType && matchVerified;
       row.style.display = visible ? '' : 'none';
-      if (visible) visible++;
+      if (visible) visibleCount++;
     });
 
     resultCount.textContent = `${visible} resources`;
