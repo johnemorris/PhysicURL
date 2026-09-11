@@ -96,6 +96,18 @@ const faqJsonLd = seo.faq.length > 0 ? {
       </div>
     )}
 
+    {/* Chemistry Wizard CTA */}
+    {science.slug === 'chemistry' && (
+      <a href="/chemistry/wizard.html" class="wizard-cta">
+        <div class="wizard-cta-icon">⚗</div>
+        <div class="wizard-cta-body">
+          <div class="wizard-cta-title">Build Your Own Chem Set</div>
+          <div class="wizard-cta-sub">Answer 4 quick questions and we’ll generate a customized equipment checklist for your age, space, focus, and budget.</div>
+        </div>
+        <div class="wizard-cta-arrow">→</div>
+      </a>
+    )}
+
     {/* Scoped Search */}
     <div class="scoped-search">
       <span class="scoped-search-icon">

@@ -1,0 +1,26 @@
+---
+import DirectoryLayout from '../../layouts/DirectoryLayout.astro';
+import ChemWizard from '../../components/ChemWizard.jsx';
+import { loadResources, buildTree, SCIENCES } from '../../lib/data';
+
+const resources = loadResources();
+const tree = buildTree(resources);
+const chemistry = SCIENCES.find(s => s.slug === 'chemistry');
+const chemCount = resources.filter(r => r.science === 'chemistry').length;
+---
+<DirectoryLayout
+  title="Home Chemistry Lab Wizard"
+  description="Answer 4 quick questions and get a customized home chemistry lab equipment checklist with safety gear, tools, and vetted shopping links."
+  breadcrumb={[
+    { label: 'PhysicURL', href: '/' },
+    { label: chemistry.name, href: '/chemistry.html' },
+    { label: 'Lab Wizard' },
+  ]}
+  tree={tree}
+  currentPath="/chemistry/wizard"
+  totalCount={chemCount}
+>
+  <div class="chem-wizard-page">
+    <ChemWizard client:load />
+  </div>
+</DirectoryLayout>

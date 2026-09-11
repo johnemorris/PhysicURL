@@ -1296,3 +1296,611 @@ ul, ol { list-style: none; }
   .admin-dashboard .admin-stats { grid-template-columns: repeat(2, 1fr); }
   .modal-overlay .modal .modal-form .modal-row { grid-template-columns: 1fr; }
 }
+
+// ===== Chemistry Wizard CTA (landing page) =====
+.wizard-cta {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 18px 22px;
+  margin: 20px 0 24px;
+  background: linear-gradient(120deg, rgba(56,189,248,0.08), rgba(168,85,247,0.08));
+  border: 1px solid rgba(56,189,248,0.35);
+  border-radius: 12px;
+  text-decoration: none;
+  color: var(--color-text);
+  transition: transform 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+
+  &:hover {
+    transform: translateY(-1px);
+    border-color: var(--color-primary);
+    background: linear-gradient(120deg, rgba(56,189,248,0.12), rgba(168,85,247,0.12));
+
+    .wizard-cta-arrow { transform: translateX(4px); }
+  }
+
+  .wizard-cta-icon {
+    font-size: 32px;
+    line-height: 1;
+    color: var(--color-primary);
+    filter: drop-shadow(0 0 10px rgba(56,189,248,0.5));
+  }
+
+  .wizard-cta-body { flex: 1; }
+
+  .wizard-cta-title {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--color-primary);
+    margin-bottom: 3px;
+  }
+
+  .wizard-cta-sub {
+    font-size: 12.5px;
+    color: var(--color-text-muted);
+    line-height: 1.45;
+  }
+
+  .wizard-cta-arrow {
+    font-size: 22px;
+    color: var(--color-primary);
+    transition: transform 0.2s ease;
+  }
+}
+
+// ===== Wizard page shell =====
+.chem-wizard-page {
+  padding: 8px 0 40px;
+}
+
+.wizard-intro {
+  min-height: 60vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 24px;
+
+  .wizard-intro-inner {
+    max-width: 640px;
+    text-align: center;
+
+    .wizard-intro-badge {
+      display: inline-block;
+      font-size: 11px;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--color-primary);
+      background: rgba(56,189,248,0.1);
+      border: 1px solid rgba(56,189,248,0.35);
+      padding: 4px 12px;
+      border-radius: 99px;
+      margin-bottom: 24px;
+      font-family: var(--font-mono);
+    }
+
+    h1 {
+      font-size: 40px;
+      line-height: 1.15;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      margin: 0 0 16px;
+
+      background: linear-gradient(120deg, var(--color-primary), var(--color-purple));
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    p {
+      font-size: 15px;
+      line-height: 1.65;
+      color: var(--color-text-muted);
+      margin: 0 0 28px;
+    }
+
+    .btn-lg {
+      font-size: 15px;
+      padding: 12px 24px;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .wizard-intro-list {
+      list-style: none;
+      padding: 0;
+      margin: 36px 0 0;
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+      text-align: left;
+
+      li {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 13px;
+        color: var(--color-text-muted);
+
+        .dot {
+          width: 8px;
+          height: 8px;
+          border-radius: 50%;
+          flex-shrink: 0;
+        }
+      }
+    }
+  }
+}
+
+// ===== Wizard two-column workspace =====
+.wizard-workspace {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  align-items: start;
+
+  .wizard-col,
+  .preview-col {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: 12px;
+    padding: 22px;
+    min-height: 520px;
+  }
+
+  .wizard-checklist {
+    grid-column: 1 / -1;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: 12px;
+    padding: 24px;
+    margin-top: 4px;
+  }
+}
+
+// ===== Progress rail =====
+.wizard-progress {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 22px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--color-border);
+
+  .wp-step {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 10px;
+    border-radius: 8px;
+    background: var(--color-canvas);
+    border: 1px solid var(--color-border);
+    cursor: pointer;
+    transition: all 0.15s;
+
+    .wp-num {
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: var(--color-surface-2);
+      color: var(--color-text-muted);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      font-weight: 700;
+      flex-shrink: 0;
+      font-family: var(--font-mono);
+    }
+
+    .wp-label {
+      font-size: 11px;
+      color: var(--color-text-muted);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    &.done {
+      border-color: rgba(16,185,129,0.4);
+      .wp-num { background: var(--color-emerald); color: #001220; }
+    }
+
+    &.active {
+      border-color: var(--color-primary);
+      background: rgba(56,189,248,0.08);
+      .wp-num { background: var(--color-primary); color: #001220; }
+      .wp-label { color: var(--color-text); font-weight: 600; }
+    }
+
+    &:hover:not(.active) { border-color: var(--color-border-light); }
+  }
+}
+
+// ===== Question card =====
+.wizard-q {
+  &.hidden { display: none; }
+
+  .wq-header { margin-bottom: 18px; }
+
+  .wq-num {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    color: var(--color-primary);
+    font-family: var(--font-mono);
+    margin-bottom: 6px;
+  }
+
+  .wq-title {
+    font-size: 22px;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    margin-bottom: 4px;
+  }
+
+  .wq-sub {
+    font-size: 12px;
+    color: var(--color-text-faint);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+
+  .wq-options {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+
+  .wq-option {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 14px 16px;
+    background: var(--color-canvas);
+    border: 1px solid var(--color-border);
+    border-radius: 10px;
+    cursor: pointer;
+    text-align: left;
+    color: var(--color-text);
+    font-family: inherit;
+    transition: all 0.15s;
+
+    .wq-icon { font-size: 24px; }
+
+    .wq-body {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+
+      .wq-label { font-size: 14px; font-weight: 600; }
+      .wq-sublabel { font-size: 11.5px; color: var(--color-text-muted); }
+    }
+
+    &:hover {
+      border-color: var(--color-primary);
+      background: var(--color-surface-2);
+    }
+
+    &.selected {
+      border-color: var(--color-primary);
+      background: rgba(56,189,248,0.12);
+      box-shadow: 0 0 0 1px rgba(56,189,248,0.3);
+    }
+  }
+
+  .wq-nav {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+
+    button:only-child { margin-left: auto; }
+  }
+}
+
+// ===== Summary strip =====
+.wizard-summary {
+  margin-top: 16px;
+  padding: 14px 16px;
+  background: rgba(16,185,129,0.08);
+  border: 1px solid rgba(16,185,129,0.35);
+  border-radius: 10px;
+
+  .ws-title {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--color-emerald);
+    margin-bottom: 4px;
+  }
+
+  .ws-meta {
+    font-size: 12px;
+    color: var(--color-text-muted);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+
+    strong { color: var(--color-text); }
+  }
+}
+
+// ===== Live Lab Preview (right column) =====
+.lab-preview {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+
+  .lab-preview-toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    .lab-title {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      color: var(--color-text-faint);
+      font-family: var(--font-mono);
+    }
+
+    .pause-btn {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: var(--color-surface-2);
+      border: 1px solid var(--color-border);
+      color: var(--color-text-muted);
+      cursor: pointer;
+      font-size: 11px;
+
+      &:hover { color: var(--color-text); border-color: var(--color-primary); }
+    }
+  }
+
+  .lab-canvas {
+    background: radial-gradient(ellipse at top, rgba(56,189,248,0.06), transparent 60%),
+                var(--color-canvas);
+    border: 1px solid var(--color-border);
+    border-radius: 10px;
+    padding: 8px;
+    aspect-ratio: 400/260;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    svg { width: 100%; height: 100%; }
+
+    &.paused * { animation-play-state: paused !important; }
+  }
+
+  .lab-metrics {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    padding: 14px;
+    background: var(--color-canvas);
+    border: 1px solid var(--color-border);
+    border-radius: 10px;
+
+    .metric {
+      text-align: center;
+
+      .metric-label {
+        font-size: 10px;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        color: var(--color-text-faint);
+        margin-bottom: 4px;
+      }
+
+      .metric-value {
+        font-size: 15px;
+        font-weight: 700;
+        font-family: var(--font-mono);
+        color: var(--color-text);
+
+        &.primary { color: var(--color-primary); }
+        &.accent { color: var(--color-emerald); font-size: 12px; }
+      }
+    }
+  }
+}
+
+// Animation keyframes
+@keyframes bubbleRise {
+  0%   { transform: translateY(0); opacity: 0; }
+  15%  { opacity: 0.9; }
+  100% { transform: translateY(-40px); opacity: 0; }
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 0.35; transform: scale(1); }
+  50%      { opacity: 1;    transform: scale(1.4); }
+}
+
+@keyframes vapor-flow {
+  0%   { stroke-dashoffset: 0; }
+  100% { stroke-dashoffset: -16; }
+}
+
+@keyframes crystal-grow {
+  0%   { transform: scale(0.4); opacity: 0; }
+  60%  { transform: scale(1.05); opacity: 1; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+@keyframes molecule-spin {
+  0%   { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes spin-slow {
+  0%   { transform: rotate(0deg); transform-origin: 200px 130px; }
+  100% { transform: rotate(360deg); transform-origin: 200px 130px; }
+}
+
+.lab-canvas {
+  .bubble { animation: bubbleRise 2.2s ease-in infinite; transform-origin: center; transform-box: fill-box; }
+  .pulse { animation: pulse 1.4s ease-in-out infinite; transform-origin: center; transform-box: fill-box; }
+  .pulse-fast { animation: pulse 0.9s ease-in-out infinite; transform-origin: center; transform-box: fill-box; }
+  .vapor { animation: vapor-flow 1s linear infinite; }
+  .crystal-grow { animation: crystal-grow 1.6s ease-out both; }
+  .molecule { animation: molecule-spin 12s linear infinite; }
+  .fade-in { animation: fade-in 0.5s ease both; }
+  .spin-slow { animation: spin-slow 20s linear infinite; }
+}
+
+// ===== Checklist =====
+.wizard-checklist {
+  .checklist-head {
+    margin-bottom: 18px;
+
+    h2 {
+      font-size: 20px;
+      font-weight: 700;
+      margin: 0 0 6px;
+    }
+
+    p {
+      font-size: 13px;
+      color: var(--color-text-muted);
+      margin: 0;
+
+      strong { color: var(--color-text); }
+    }
+  }
+
+  .checklist-banner {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 10px 14px;
+    background: rgba(245,158,11,0.08);
+    border: 1px solid rgba(245,158,11,0.4);
+    border-radius: 8px;
+    margin-bottom: 16px;
+    color: var(--color-amber);
+    font-size: 12px;
+    font-weight: 600;
+  }
+
+  .checklist-section {
+    margin-bottom: 18px;
+
+    .cs-title {
+      font-size: 13px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--color-primary);
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+
+      .cs-icon { font-size: 18px; }
+    }
+
+    .cs-items {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .cs-row {
+      display: grid;
+      grid-template-columns: 1fr auto auto;
+      gap: 14px;
+      align-items: center;
+      padding: 10px 14px;
+      background: var(--color-canvas);
+      border: 1px solid var(--color-border-light);
+      border-radius: 6px;
+
+      .cs-name .cs-label {
+        font-size: 13px;
+        font-weight: 500;
+      }
+
+      .cs-price {
+        font-family: var(--font-mono);
+        font-size: 13px;
+        color: var(--color-text-muted);
+      }
+
+      .cs-link {
+        font-size: 12px;
+        color: var(--color-primary);
+        text-decoration: none;
+        white-space: nowrap;
+
+        &:hover { text-decoration: underline; }
+      }
+    }
+  }
+
+  .checklist-bundle {
+    display: grid;
+    grid-template-columns: 1fr auto auto;
+    gap: 16px;
+    align-items: center;
+    padding: 14px 18px;
+    background: linear-gradient(120deg, rgba(56,189,248,0.08), rgba(168,85,247,0.08));
+    border: 1px solid var(--color-primary);
+    border-radius: 10px;
+    margin-top: 12px;
+
+    .bundle-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--color-text);
+    }
+
+    .bundle-sub {
+      font-size: 12px;
+      color: var(--color-text-muted);
+      margin-top: 2px;
+    }
+
+    .bundle-price {
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--color-primary);
+      font-family: var(--font-mono);
+    }
+  }
+
+  .checklist-legal {
+    margin-top: 20px;
+    padding-top: 16px;
+    border-top: 1px solid var(--color-border);
+    font-size: 11px;
+    color: var(--color-text-faint);
+    line-height: 1.6;
+    font-style: italic;
+  }
+}
+
+@media (max-width: 1024px) {
+  .wizard-workspace {
+    grid-template-columns: 1fr;
+
+    .preview-col { min-height: 380px; }
+  }
+  .wizard-progress .wp-step .wp-label { display: none; }
+}
+
+@media (max-width: 640px) {
+  .wizard-intro .wizard-intro-inner h1 { font-size: 28px; }
+  .wizard-intro .wizard-intro-inner .wizard-intro-list { grid-template-columns: 1fr; }
+  .lab-preview .lab-metrics { grid-template-columns: 1fr; }
+  .wizard-checklist .checklist-bundle,
+  .wizard-checklist .checklist-section .cs-row { grid-template-columns: 1fr; }
+}
