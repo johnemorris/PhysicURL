@@ -1,0 +1,205 @@
+{
+  "physics": {
+    "intro": "Physics is the fundamental science of matter, energy, space, and time. From the subatomic scale of quantum mechanics to the cosmic scale of astrophysics, physics seeks to understand the laws that govern the universe. This directory indexes the best physics resources available online \u2014 research databases, simulation tools, educational materials, university programs, and professional organizations.",
+    "key_concepts": [
+      "Classical mechanics and Newtonian dynamics",
+      "Quantum mechanics and wave-particle duality",
+      "Electromagnetism and Maxwell's equations",
+      "Thermodynamics and statistical mechanics",
+      "Particle physics and the Standard Model",
+      "Condensed matter and materials physics"
+    ],
+    "faq": [
+      {
+        "q": "What is physics?",
+        "a": "Physics is the natural science that studies matter, its motion and behavior through space and time, and the related entities of energy and force. It is one of the most fundamental scientific disciplines."
+      },
+      {
+        "q": "What are the main branches of physics?",
+        "a": "The main branches include classical mechanics, quantum mechanics, electromagnetism, thermodynamics, optics, particle physics, nuclear physics, condensed matter physics, and fluid dynamics."
+      },
+      {
+        "q": "Where can I find free physics resources?",
+        "a": "This directory indexes hundreds of free physics resources including arXiv preprints, PhET simulations, university open courseware, NIST reference data, and NASA databases. Use the Access filter to find free resources."
+      },
+      {
+        "q": "What software tools are available for physics?",
+        "a": "Popular physics software includes myPhysicsLab for simulations, Tracker for video analysis, Physion for 2D simulation, and Maple/Mathematica for symbolic computation. See the Software Tools subdiscipline for the full list."
+      }
+    ]
+  },
+  "chemistry": {
+    "intro": "Chemistry is the science of matter \u2014 its composition, structure, properties, and transformations. From the periodic table to molecular modeling, chemistry connects the physical world to biology, materials science, and medicine. This directory indexes essential chemistry resources: chemical databases, molecular tools, educational platforms, and professional organizations.",
+    "key_concepts": [
+      "Periodic table and atomic structure",
+      "Organic chemistry and synthesis",
+      "Physical chemistry and thermodynamics",
+      "Analytical chemistry and spectroscopy",
+      "Chemical bonding and molecular geometry",
+      "Biochemistry and molecular biology"
+    ],
+    "faq": [
+      {
+        "q": "What is chemistry?",
+        "a": "Chemistry is the scientific discipline involved with elements and compounds composed of atoms, molecules, and ions. It studies their composition, structure, properties, behavior, and the changes they undergo during reactions."
+      },
+      {
+        "q": "What are the best free chemistry databases?",
+        "a": "PubChem, ChemSpider, NIST Chemistry WebBook, and ChEBI are among the best free chemistry databases. This directory indexes all of them with descriptions and access information."
+      },
+      {
+        "q": "What software is used in chemistry?",
+        "a": "Popular chemistry software includes Avogadro for molecular editing, Mol* for visualization, PhET for educational simulations, and Rowan for computational chemistry. See the Software Tools subdiscipline for the full list."
+      },
+      {
+        "q": "What is the difference between organic and inorganic chemistry?",
+        "a": "Organic chemistry studies carbon-containing compounds, while inorganic chemistry focuses on compounds without carbon-hydrogen bonds. Both are indexed separately in this directory."
+      }
+    ]
+  },
+  "astronomy": {
+    "intro": "Astronomy is the science of celestial objects, space, and the physical universe as a whole. From planetary observation to cosmology, astronomy combines observation, theory, and computation to understand the cosmos. This directory indexes the world's premier astronomy resources \u2014 sky surveys, telescope archives, databases, simulation tools, and educational platforms.",
+    "key_concepts": [
+      "Observational astronomy and telescopes",
+      "Astrophysics and stellar evolution",
+      "Cosmology and the Big Bang",
+      "Planetary science and exoplanets",
+      "Galactic structure and dynamics",
+      "High-energy astrophysics"
+    ],
+    "faq": [
+      {
+        "q": "What is astronomy?",
+        "a": "Astronomy is the scientific study of celestial objects, phenomena, and the physical universe. It encompasses observation, theory, and computation to understand stars, planets, galaxies, and the cosmos."
+      },
+      {
+        "q": "What are the best free astronomy tools?",
+        "a": "Stellarium is a free planetarium app, NASA ADS provides astronomy literature search, and Sky & Telescope offers interactive stargazing tools. See the Software Tools subdiscipline for the complete list."
+      },
+      {
+        "q": "Where can I access astronomical data?",
+        "a": "NASA's MAST archive, SDSS sky survey, Gaia stellar catalog, SIMBAD, and NED are all excellent free data sources indexed in this directory."
+      },
+      {
+        "q": "How do I start stargazing?",
+        "a": "The Astronomical League's night sky navigation guides and Sky & Telescope's interactive tools are great starting points. A free planetarium app like Stellarium can help you identify what you see."
+      }
+    ]
+  },
+  "earth-sciences": {
+    "intro": "Earth science encompasses geology, meteorology, oceanography, and environmental science \u2014 the study of our planet's physical characteristics, atmosphere, oceans, and living systems. This directory indexes authoritative Earth science resources including USGS data, NOAA archives, GIS tools, and educational materials.",
+    "key_concepts": [
+      "Geology and plate tectonics",
+      "Meteorology and atmospheric science",
+      "Oceanography and marine science",
+      "Climate science and global change",
+      "Environmental science and sustainability",
+      "Geophysics and seismology"
+    ],
+    "faq": [
+      {
+        "q": "What is Earth science?",
+        "a": "Earth science is the study of the planet's physical characteristics, from its solid earth and rocks to its atmosphere, oceans, and living systems. It includes geology, meteorology, oceanography, and environmental science."
+      },
+      {
+        "q": "Where can I find free geological data?",
+        "a": "The USGS provides extensive free geological data, maps, and real-time earthquake monitoring. NASA Earthdata offers satellite observations. Both are indexed in this directory."
+      },
+      {
+        "q": "What GIS tools are available for Earth science?",
+        "a": "ArcGIS Online, NASA Earthdata GIS, and Earth Model's free GIS tools are excellent options. See the Software Tools subdiscipline for the full list."
+      },
+      {
+        "q": "How is climate science related to Earth science?",
+        "a": "Climate science is a subdiscipline of Earth science that studies long-term weather patterns, atmospheric composition, and global environmental change. It draws on data from NOAA, NASA, and other agencies."
+      }
+    ]
+  },
+  "biophysics": {
+    "intro": "Biophysics applies the principles and methods of physics to understand biological systems. From protein folding to membrane dynamics, biophysics bridges the gap between molecular structure and biological function. This directory indexes key biophysics resources \u2014 structural databases, molecular visualization tools, research organizations, and educational materials.",
+    "key_concepts": [
+      "Protein structure and folding",
+      "Molecular dynamics simulations",
+      "Membrane biophysics",
+      "Biomechanics and cell mechanics",
+      "Bioinformatics and computational biology",
+      "Spectroscopy and imaging"
+    ],
+    "faq": [
+      {
+        "q": "What is biophysics?",
+        "a": "Biophysics is an interdisciplinary science that applies approaches and methods of physics to study biological systems at all scales, from molecules to organisms."
+      },
+      {
+        "q": "What software is used in biophysics?",
+        "a": "VMD for molecular visualization, Mol* for web-based structure viewing, and MDTools for molecular dynamics analysis are widely used. See the Software Tools subdiscipline for more."
+      },
+      {
+        "q": "Where can I find protein structure data?",
+        "a": "The Protein Data Bank (PDB) at RCSB.org is the primary repository for 3D biological macromolecular structures. It's free and indexed in this directory."
+      },
+      {
+        "q": "How is biophysics different from biochemistry?",
+        "a": "Biophysics focuses on physical principles like forces, energy, and thermodynamics in biological systems, while biochemistry focuses on chemical reactions and metabolic pathways. They overlap significantly."
+      }
+    ]
+  },
+  "materials-science": {
+    "intro": "Materials science studies the properties, structure, and applications of materials \u2014 from metals and ceramics to polymers, nanomaterials, and composites. It drives innovation in energy, electronics, aerospace, and medicine. This directory indexes essential materials science resources including crystallography databases, simulation tools, and reference materials.",
+    "key_concepts": [
+      "Crystallography and crystal structures",
+      "Nanotechnology and nanomaterials",
+      "Computational materials science",
+      "Mechanical properties and testing",
+      "Thermodynamics of materials",
+      "Biomaterials and composites"
+    ],
+    "faq": [
+      {
+        "q": "What is materials science?",
+        "a": "Materials science is an interdisciplinary field that studies the properties of matter and its applications. It investigates the relationship between the structure of materials at atomic or molecular scales and their macroscopic properties."
+      },
+      {
+        "q": "Where can I find crystal structure data?",
+        "a": "The Cambridge Structural Database (CSD) and Crystallography Open Database (COD) are the primary free and freemium crystal structure repositories. Both are indexed in this directory."
+      },
+      {
+        "q": "What software is used in materials science?",
+        "a": "Materials Studio, Thermo-Calc, and various DFT packages are used for simulation. See the Software Tools subdiscipline and the Wikipedia list of materials science software for a comprehensive overview."
+      },
+      {
+        "q": "What is the difference between nanotechnology and materials science?",
+        "a": "Nanotechnology is a subdiscipline of materials science focused on materials at the nanometer scale (1-100nm). Materials science encompasses all material scales and types."
+      }
+    ]
+  },
+  "mathematical-physics": {
+    "intro": "Mathematical physics develops mathematical methods for solving physics problems. From differential equations to group theory, it provides the rigorous mathematical framework underlying all of physics. This directory indexes computational tools, reference databases, and educational resources for mathematical physics research.",
+    "key_concepts": [
+      "Differential equations and mathematical modeling",
+      "Group theory and symmetries",
+      "Tensor analysis and differential geometry",
+      "Numerical methods and computation",
+      "Functional analysis and Hilbert spaces",
+      "Statistical mechanics"
+    ],
+    "faq": [
+      {
+        "q": "What is mathematical physics?",
+        "a": "Mathematical physics is the development of mathematical methods for application to problems in physics. It provides the rigorous mathematical framework for theories like quantum mechanics, relativity, and statistical mechanics."
+      },
+      {
+        "q": "What software is used in mathematical physics?",
+        "a": "Maple, Mathematica, and MATLAB are the most widely used tools for symbolic and numerical computation. See the Software Tools subdiscipline for the full list."
+      },
+      {
+        "q": "How is mathematical physics different from theoretical physics?",
+        "a": "Mathematical physics focuses on developing the mathematical methods and frameworks, while theoretical physics applies those methods to develop physical theories. They overlap significantly in practice."
+      },
+      {
+        "q": "Where can I find free mathematical physics references?",
+        "a": "arXiv's math-ph section provides free preprints. Open Culture lists free university courses. This directory indexes both along with computational tools and reference databases."
+      }
+    ]
+  }
+}

@@ -1,0 +1,366 @@
+{
+  "https://asbiomech.org": {
+    "status": "dead",
+    "details": "Connection error: HTTPSConnectionPool(host='asbiomech.org', port=443): Max retries exceeded with url: / (Caused by Nam",
+    "checked": "2026-09-11T04:14:45.271636+00:00",
+    "http_status": null,
+    "page_title": ""
+  },
+  "https://david.ncifcrf.gov": {
+    "status": "dead",
+    "details": "Connection error: HTTPSConnectionPool(host='david.ncifcrf.gov', port=443): Max retries exceeded with url: / (Caused by",
+    "checked": "2026-09-11T04:14:45.271636+00:00",
+    "http_status": null,
+    "page_title": ""
+  },
+  "https://encyclopediaofmath.org": {
+    "status": "dead",
+    "details": "HTTP 502 \u2014 server error",
+    "checked": "2026-09-11T04:14:45.271636+00:00",
+    "http_status": 502,
+    "page_title": ""
+  },
+  "https://figshare.com": {
+    "status": "dead",
+    "details": "HTTP 202",
+    "checked": "2026-09-11T04:14:45.271636+00:00",
+    "http_status": 202,
+    "page_title": ""
+  },
+  "https://www.crystallography.net/icsd/": {
+    "status": "dead",
+    "details": "HTTP 404 \u2014 page not found",
+    "checked": "2026-09-11T04:14:45.271636+00:00",
+    "http_status": 404,
+    "page_title": ""
+  },
+  "https://www.ioc.unesco.org": {
+    "status": "dead",
+    "details": "Connection error: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))",
+    "checked": "2026-09-11T04:14:45.271636+00:00",
+    "http_status": null,
+    "page_title": ""
+  },
+  "https://www.materialstoday.com": {
+    "status": "dead",
+    "details": "Connection error: HTTPSConnectionPool(host='www.materialstoday.com', port=443): Max retries exceeded with url: / (Caus",
+    "checked": "2026-09-11T04:14:45.271636+00:00",
+    "http_status": null,
+    "page_title": ""
+  },
+  "https://www.fkf.mpg.de": {
+    "status": "dead",
+    "details": "HTTP 502 \u2014 server error",
+    "checked": "2026-09-11T04:14:45.271636+00:00",
+    "http_status": 502,
+    "page_title": ""
+  },
+  "https://ocw.mit.edu/departments/physics/": {
+    "status": "dead",
+    "details": "HTTP 404 \u2014 page not found",
+    "checked": "2026-09-11T04:14:45.271636+00:00",
+    "http_status": 404,
+    "page_title": ""
+  },
+  "https://www.nanomaterialregistry.org": {
+    "status": "dead",
+    "details": "Connection error: HTTPSConnectionPool(host='www.nanomaterialregistry.org', port=443): Max retries exceeded with url: /",
+    "checked": "2026-09-11T04:14:45.271636+00:00",
+    "http_status": null,
+    "page_title": ""
+  },
+  "https://ui.adsabs.harvard.edu": {
+    "status": "dead",
+    "details": "HTTP 202",
+    "checked": "2026-09-11T04:14:45.271636+00:00",
+    "http_status": 202,
+    "page_title": ""
+  },
+  "https://www.nature.com/nphysics/": {
+    "status": "dead",
+    "details": "HTTP 404 \u2014 page not found",
+    "checked": "2026-09-11T04:14:45.271636+00:00",
+    "http_status": 404,
+    "page_title": ""
+  },
+  "https://www.nvdl.noaa.gov": {
+    "status": "dead",
+    "details": "Connection error: HTTPSConnectionPool(host='www.nvdl.noaa.gov', port=443): Max retries exceeded with url: / (Caused by",
+    "checked": "2026-09-11T04:14:45.271636+00:00",
+    "http_status": null,
+    "page_title": ""
+  },
+  "http://www.physics247.com": {
+    "status": "dead",
+    "details": "Connection error: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))",
+    "checked": "2026-09-11T04:14:45.271636+00:00",
+    "http_status": null,
+    "page_title": ""
+  },
+  "https://www.physics.utoronto.ca/~jensen/flash/": {
+    "status": "dead",
+    "details": "HTTP 404 \u2014 page not found",
+    "checked": "2026-09-11T04:14:45.271636+00:00",
+    "http_status": 404,
+    "page_title": ""
+  },
+  "https://physicsworld.com/l/student/": {
+    "status": "dead",
+    "details": "HTTP 404 \u2014 page not found",
+    "checked": "2026-09-11T04:14:45.271636+00:00",
+    "http_status": 404,
+    "page_title": ""
+  },
+  "http://en.roscosmos.ru": {
+    "status": "dead",
+    "details": "HTTP 504 \u2014 server error",
+    "checked": "2026-09-11T04:14:45.271636+00:00",
+    "http_status": 504,
+    "page_title": ""
+  },
+  "https://www.xfel.riken.jp": {
+    "status": "dead",
+    "details": "Connection error: HTTPSConnectionPool(host='www.xfel.riken.jp', port=443): Max retries exceeded with url: / (Caused by",
+    "checked": "2026-09-11T04:14:45.271636+00:00",
+    "http_status": null,
+    "page_title": ""
+  },
+  "https://skyserver.sdss.org": {
+    "status": "dead",
+    "details": "Connection error: ('Connection aborted.', ConnectionResetError(104, 'Connection reset by peer'))",
+    "checked": "2026-09-11T04:14:45.271636+00:00",
+    "http_status": null,
+    "page_title": ""
+  },
+  "https://space.mit.edu/home/tegmark/": {
+    "status": "dead",
+    "details": "Connection error: ('Connection aborted.', ConnectionResetError(104, 'Connection reset by peer'))",
+    "checked": "2026-09-11T04:14:45.271636+00:00",
+    "http_status": null,
+    "page_title": ""
+  },
+  "https://www.youtube.com/user/kishoreyedla": {
+    "status": "dead",
+    "details": "HTTP 404 \u2014 page not found",
+    "checked": "2026-09-11T04:14:45.271636+00:00",
+    "http_status": 404,
+    "page_title": ""
+  },
+  "https://www.ipp.mpg.de/w7x": {
+    "status": "dead",
+    "details": "HTTP 502 \u2014 server error",
+    "checked": "2026-09-11T04:14:45.271636+00:00",
+    "http_status": 502,
+    "page_title": ""
+  },
+  "https://biomech.org": {
+    "status": "timeout",
+    "details": "Request timed out after 10s",
+    "checked": "2026-09-11T04:14:45.271636+00:00",
+    "http_status": null,
+    "page_title": ""
+  },
+  "https://www.bipm.org": {
+    "status": "timeout",
+    "details": "Request timed out after 10s",
+    "checked": "2026-09-11T04:14:45.271636+00:00",
+    "http_status": null,
+    "page_title": ""
+  },
+  "http://www.cnsa.gov.cn": {
+    "status": "timeout",
+    "details": "Request timed out after 10s",
+    "checked": "2026-09-11T04:14:45.271636+00:00",
+    "http_status": null,
+    "page_title": ""
+  },
+  "https://azure.microsoft.com/en-us/products/quantum": {
+    "status": "timeout",
+    "details": "Request timed out after 10s",
+    "checked": "2026-09-11T04:14:45.271636+00:00",
+    "http_status": null,
+    "page_title": ""
+  },
+  "https://www.sigmaaldrich.com": {
+    "status": "timeout",
+    "details": "Request timed out after 10s",
+    "checked": "2026-09-11T04:14:45.271636+00:00",
+    "http_status": null,
+    "page_title": ""
+  },
+  "https://www.nrcs.usda.gov": {
+    "status": "timeout",
+    "details": "Request timed out after 10s",
+    "checked": "2026-09-11T04:14:45.271636+00:00",
+    "http_status": null,
+    "page_title": ""
+  },
+  "https://www.acs.org": {
+    "status": "repurposed",
+    "details": "Page title and content don't match expected resource topic",
+    "checked": "2026-09-11T04:14:45.271636+00:00",
+    "http_status": 200,
+    "page_title": ""
+  },
+  "https://brilliant.org": {
+    "status": "repurposed",
+    "details": "Page title and content don't match expected resource topic",
+    "checked": "2026-09-11T04:14:45.271636+00:00",
+    "http_status": 200,
+    "page_title": "Brilliant | Your Personal Tutor for Math and Coding"
+  },
+  "http://www.chem4kids.com": {
+    "status": "repurposed",
+    "details": "Page title and content don't match expected resource topic",
+    "checked": "2026-09-11T04:14:45.271636+00:00",
+    "http_status": 200,
+    "page_title": ""
+  },
+  "https://www.sciencehistory.org": {
+    "status": "repurposed",
+    "details": "Page title and content don't match expected resource topic",
+    "checked": "2026-09-11T04:14:45.271636+00:00",
+    "http_status": 200,
+    "page_title": ""
+  },
+  "https://www.coursera.org": {
+    "status": "repurposed",
+    "details": "Page title and content don't match expected resource topic",
+    "checked": "2026-09-11T04:14:45.271636+00:00",
+    "http_status": 200,
+    "page_title": ""
+  },
+  "https://www.ebi.ac.uk/ena/browser/home": {
+    "status": "repurposed",
+    "details": "Page title and content don't match expected resource topic",
+    "checked": "2026-09-11T04:14:45.271636+00:00",
+    "http_status": 200,
+    "page_title": "ENA Browser"
+  },
+  "https://www.europeanopticalsociety.org": {
+    "status": "repurposed",
+    "details": "Page title and content don't match expected resource topic",
+    "checked": "2026-09-11T04:14:45.271636+00:00",
+    "http_status": 200,
+    "page_title": "Account Suspended"
+  },
+  "https://www.fishersci.com": {
+    "status": "repurposed",
+    "details": "Page title and content don't match expected resource topic",
+    "checked": "2026-09-11T04:14:45.271636+00:00",
+    "http_status": 200,
+    "page_title": ""
+  },
+  "https://www.fishersci.com/us/en/periodic-table.html": {
+    "status": "repurposed",
+    "details": "Page title and content don't match expected resource topic",
+    "checked": "2026-09-11T04:14:45.271636+00:00",
+    "http_status": 200,
+    "page_title": "accessibility menu, dialog, popup"
+  },
+  "https://www.fluke.com": {
+    "status": "repurposed",
+    "details": "Page title and content don't match expected resource topic",
+    "checked": "2026-09-11T04:14:45.271636+00:00",
+    "http_status": 200,
+    "page_title": ""
+  },
+  "https://www.ictp.it": {
+    "status": "repurposed",
+    "details": "Page title and content don't match expected resource topic",
+    "checked": "2026-09-11T04:14:45.271636+00:00",
+    "http_status": 200,
+    "page_title": "Home | ICTP"
+  },
+  "https://isaacphysics.org": {
+    "status": "repurposed",
+    "details": "Domain changed (isaacphysics.org -> isaacscience.org) and content doesn't match expected topic",
+    "checked": "2026-09-11T04:14:45.271636+00:00",
+    "http_status": 200,
+    "page_title": "Isaac Science"
+  },
+  "https://www.jhep.org": {
+    "status": "repurposed",
+    "details": "Domain changed (jhep.org -> elanseniorlife.org) and content doesn't match expected topic",
+    "checked": "2026-09-11T04:14:45.271636+00:00",
+    "http_status": 200,
+    "page_title": "Home - Jewish Senior Life of Eastern Pennsylvania"
+  },
+  "https://www.khanacademy.org/science/cosmology-and-astronomy": {
+    "status": "repurposed",
+    "details": "Page title and content don't match expected resource topic",
+    "checked": "2026-09-11T04:14:45.271636+00:00",
+    "http_status": 200,
+    "page_title": "Client Challenge"
+  },
+  "https://www.khanacademy.org/math": {
+    "status": "repurposed",
+    "details": "Page title and content don't match expected resource topic",
+    "checked": "2026-09-11T04:14:45.271636+00:00",
+    "http_status": 200,
+    "page_title": "Client Challenge"
+  },
+  "https://www.khanacademy.org/science/physics": {
+    "status": "repurposed",
+    "details": "Page title and content don't match expected resource topic",
+    "checked": "2026-09-11T04:14:45.271636+00:00",
+    "http_status": 200,
+    "page_title": "Client Challenge"
+  },
+  "https://mast.stsci.edu": {
+    "status": "repurposed",
+    "details": "Page title and content don't match expected resource topic",
+    "checked": "2026-09-11T04:14:45.271636+00:00",
+    "http_status": 200,
+    "page_title": "MAST Portal \u00c2\u00b7 STScI"
+  },
+  "https://www.msri.org": {
+    "status": "repurposed",
+    "details": "Domain changed (msri.org -> slmath.org) and content doesn't match expected topic",
+    "checked": "2026-09-11T04:14:45.271636+00:00",
+    "http_status": 200,
+    "page_title": "SLMath"
+  },
+  "https://osf.io": {
+    "status": "repurposed",
+    "details": "Page title and content don't match expected resource topic",
+    "checked": "2026-09-11T04:14:45.271636+00:00",
+    "http_status": 200,
+    "page_title": "OSF"
+  },
+  "https://openstax.org/subjects/science": {
+    "status": "repurposed",
+    "details": "Page title and content don't match expected resource topic",
+    "checked": "2026-09-11T04:14:45.271636+00:00",
+    "http_status": 200,
+    "page_title": "OpenStax"
+  },
+  "https://www.osapublishing.org": {
+    "status": "repurposed",
+    "details": "Domain changed (osapublishing.org -> validate.perfdrive.com) and content doesn't match expected topic",
+    "checked": "2026-09-11T04:14:45.271636+00:00",
+    "http_status": 200,
+    "page_title": "Radware Captcha Page"
+  },
+  "https://www.spiedigitallibrary.org": {
+    "status": "repurposed",
+    "details": "Page title and content don't match expected resource topic",
+    "checked": "2026-09-11T04:14:45.271636+00:00",
+    "http_status": 200,
+    "page_title": ""
+  },
+  "https://www.sympy.org": {
+    "status": "repurposed",
+    "details": "Page title and content don't match expected resource topic",
+    "checked": "2026-09-11T04:14:45.271636+00:00",
+    "http_status": 200,
+    "page_title": ""
+  },
+  "https://us.vwr.com": {
+    "status": "repurposed",
+    "details": "Domain changed (us.vwr.com -> vwr.com) and content doesn't match expected topic",
+    "checked": "2026-09-11T04:14:45.271636+00:00",
+    "http_status": 200,
+    "page_title": ""
+  }
+}

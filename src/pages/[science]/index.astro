@@ -1,0 +1,254 @@
+---
+import DirectoryLayout from '../../layouts/DirectoryLayout.astro';
+import { loadResources, loadSEOContent, loadStatusMap, buildTree, SCIENCES, RESOURCE_TYPE_LABELS, ACCESS_LABELS, slugify } from '../../lib/data';
+import { scienceContent } from '../../lib/scienceContent.js';
+import { scienceDiagrams } from '../../lib/scienceDiagrams.js';
+
+export function getStaticPaths() {
+  const resources = loadResources();
+  return SCIENCES.map(sci => {
+    const sciResources = resources.filter(r => r.science === sci.slug);
+    if (sciResources.length === 0) return null;
+    return {
+      params: { science: sci.slug },
+      props: { science: sci, sciResources },
+    };
+  }).filter(Boolean);
+}
+
+const { science, sciResources } = Astro.props;
+const allResources = loadResources();
+const statusMap = loadStatusMap();
+const seoContent = loadSEOContent();
+const tree = buildTree(allResources);
+const seo = seoContent[science.slug] || { intro: science.description, key_concepts: [], faq: [] };
+const landing = scienceContent[science.slug] || {};
+const diagram = scienceDiagrams[science.slug] || '';
+
+// Group by subdiscipline
+const bySub = {};
+for (const r of sciResources) {
+  if (!bySub[r.subdiscipline]) bySub[r.subdiscipline] = [];
+  bySub[r.subdiscipline].push(r);
+}
+const sortedSubs = Object.entries(bySub).sort((a, b) => b[1].length - a[1].length);
+
+// FAQ JSON-LD
+const faqJsonLd = seo.faq.length > 0 ? {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: seo.faq.map(f => ({
+    '@type': 'Question',
+    name: f.q,
+    acceptedAnswer: { '@type': 'Answer', text: f.a },
+  })),
+} : null;
+---
+
+<DirectoryLayout
+  title={science.name}
+  description={science.description}
+  breadcrumb={[{ label: 'PhysicURL', href: '/' }, { label: science.name }]}
+  tree={tree}
+  currentPath={`/${science.slug}`}
+  totalCount={sciResources.length}
+>
+  {faqJsonLd && <script type="application/ld+json" set:html={JSON.stringify(faqJsonLd)} />}
+
+  {/* Science Landing Content */}
+  <div class="science-landing">
+    {/* Hero with intro + diagram */}
+    <div class="science-hero">
+      <div class="science-intro">
+        <h2>About {science.name}</h2>
+        <p>{landing.history || seo.intro || science.description}</p>
+      </div>
+      {diagram && <div class="science-diagram" set:html={diagram} />}
+    </div>
+
+    {/* Info cards: History, Tools, Fun Fact */}
+    <div class="science-info-grid">
+      {landing.tools && (
+        <div class="info-card">
+          <div class="info-label">Tools of the Trade</div>
+          <div class="info-text">{landing.tools}</div>
+        </div>
+      )}
+      {landing.history && (
+        <div class="info-card">
+          <div class="info-label">History</div>
+          <div class="info-text">{landing.history}</div>
+        </div>
+      )}
+      {seo.key_concepts && seo.key_concepts.length > 0 && (
+        <div class="info-card">
+          <div class="info-label">Key Concepts</div>
+          <div class="info-text">{seo.key_concepts.join(', ')}</div>
+        </div>
+      )}
+    </div>
+
+    {/* Fun Fact */}
+    {landing.funFact && (
+      <div class="science-fun-fact">
+        <div class="fun-fact-label">Did You Know?</div>
+        <div class="fun-fact-text">{landing.funFact}</div>
+      </div>
+    )}
+
+    {/* Scoped Search */}
+    <div class="scoped-search">
+      <span class="scoped-search-icon">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+      </span>
+      <input type="text" id="scoped-search" placeholder={landing.searchPlaceholder || `Search ${science.name} resources...`} />
+    </div>
+  </div>
+
+  {/* Filter Bar */}
+  <div class="filter-bar">
+    <div class="filter-group">
+      <label>Access</label>
+      <select id="filter-access">
+        <option value="all">All Access</option>
+        <option value="free">Free</option>
+        <option value="paid">Paid</option>
+        <option value="freemium">Freemium</option>
+      </select>
+    </div>
+    <div class="filter-group">
+      <label>Type</label>
+      <select id="filter-type">
+        <option value="all">All Types</option>
+        {Object.entries(RESOURCE_TYPE_LABELS).map(([k, v]) => <option value={k}>{v}</option>)}
+      </select>
+    </div>
+    <div class="filter-group">
+      <label>Verified</label>
+      <select id="filter-verified">
+        <option value="all">All Status</option>
+        <option value="verified">Verified</option>
+      </select>
+    </div>
+    <div class="filter-group sort-group">
+      <label>Sort</label>
+      <select id="sort-select">
+        <option value="relevance">Relevance</option>
+        <option value="rating">Rating</option>
+        <option value="alphabetical">Alphabetical</option>
+      </select>
+    </div>
+    <span class="result-count" id="result-count">{sciResources.length} resources</span>
+  </div>
+
+  {/* Resource List */}
+  <div class="resource-list" id="resource-list">
+    {sortedSubs.map(([subName, subResources]) => {
+      const sorted = [...subResources].sort((a, b) => b.rating - a.rating);
+      return (
+        <div class="resource-section">
+          <div class="resource-section-title">{subName} ({subResources.length})</div>
+          {sorted.map(r => {
+            const status = statusMap[r.url];
+            const isUnderReview = !!status;
+            return (
+              <div class={`resource-row ${isUnderReview ? 'under-review' : ''}`} data-access={r.access} data-type={r.resourceType} data-verified={r.isVerified} data-rating={r.rating} data-title={r.title.toLowerCase()} data-desc={r.description.toLowerCase()} data-domain={r.domain.toLowerCase()} data-tags={r.tags.join(' ').toLowerCase()} data-sub={r.subdiscipline.toLowerCase()}>
+                <div class="resource-title-line">
+                  <a href={r.url} target="_blank" rel="noopener" class={`resource-title ${isUnderReview ? 'disabled-link' : ''}`}>{r.title}</a>
+                  {r.isVerified && <span class="verified-badge">✓ Verified</span>}
+                  {isUnderReview && <span class="review-badge" title={status?.details || 'Under review'}>⚠ Under Review</span>}
+                  {r.isAffiliate && <span class="affiliate-badge">Affiliate</span>}
+                  <span class="resource-domain">{r.domain}</span>
+                </div>
+                <div class="resource-description">{r.description}</div>
+                <div class="resource-tags">
+                  {r.tags.map(tag => <span class="resource-tag">#{tag}</span>)}
+                </div>
+                <div class="resource-meta">
+                  <span class={`access-badge-${r.access}`}>{ACCESS_LABELS[r.access] || r.access}</span>
+                  <span class="rating">★ {r.rating}</span>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      );
+    })}
+  </div>
+
+  {/* FAQ Section */}
+  {seo.faq.length > 0 && (
+    <section class="faq-section">
+      <h2>Frequently Asked Questions About {science.name}</h2>
+      {seo.faq.map(f => (
+        <details class="faq-item">
+          <summary>{f.q}</summary>
+          <p>{f.a}</p>
+        </details>
+      ))}
+    </section>
+  )}
+</DirectoryLayout>
+
+<script is:inline>
+  // Scoped search — filters within this science only
+  const scopedSearch = document.getElementById('scoped-search');
+  const filterAccess = document.getElementById('filter-access');
+  const filterType = document.getElementById('filter-type');
+  const filterVerified = document.getElementById('filter-verified');
+  const sortSelect = document.getElementById('sort-select');
+  const resultCount = document.getElementById('result-count');
+  const rows = document.querySelectorAll('.resource-row');
+
+  function applyFilters() {
+    const q = scopedSearch.value.toLowerCase().trim();
+    const access = filterAccess.value;
+    const type = filterType.value;
+    const verified = filterVerified.value;
+    const sort = sortSelect.value;
+    let count = 0;
+
+    rows.forEach(row => {
+      const matchSearch = q === '' ||
+        row.dataset.title.includes(q) ||
+        row.dataset.desc.includes(q) ||
+        row.dataset.domain.includes(q) ||
+        row.dataset.tags.includes(q) ||
+        row.dataset.sub.includes(q);
+      const matchAccess = access === 'all' || row.dataset.access === access;
+      const matchType = type === 'all' || row.dataset.type === type;
+      const matchVerified = verified === 'all' || (verified === 'verified' && row.dataset.verified === 'true');
+      const show = matchSearch && matchAccess && matchType && matchVerified;
+      row.style.display = show ? '' : 'none';
+      if (show) count++;
+    });
+
+    resultCount.textContent = count + ' resources';
+
+    // Hide empty sections
+    document.querySelectorAll('.resource-section').forEach(sec => {
+      const visible = sec.querySelectorAll('.resource-row:not([style*="none"])').length;
+      sec.style.display = visible > 0 ? '' : 'none';
+    });
+
+    // Sort
+    if (sort === 'rating' || sort === 'relevance') {
+      document.querySelectorAll('.resource-section').forEach(sec => {
+        const subRows = Array.from(sec.querySelectorAll('.resource-row'));
+        subRows.sort((a, b) => parseFloat(b.dataset.rating) - parseFloat(a.dataset.rating));
+        subRows.forEach(r => sec.appendChild(r));
+      });
+    } else if (sort === 'alphabetical') {
+      document.querySelectorAll('.resource-section').forEach(sec => {
+        const subRows = Array.from(sec.querySelectorAll('.resource-row'));
+        subRows.sort((a, b) => a.dataset.title.localeCompare(b.dataset.title));
+        subRows.forEach(r => sec.appendChild(r));
+      });
+    }
+  }
+
+  [scopedSearch, filterAccess, filterType, filterVerified, sortSelect].forEach(el => {
+    el.addEventListener('input', applyFilters);
+    el.addEventListener('change', applyFilters);
+  });
+</script>

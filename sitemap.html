@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PhysicURL — Site Tree</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { background:#080C14; color:#E2E8F0; font-family:'Inter',system-ui,sans-serif; padding:40px; min-height:100vh; }
+  h1 { font-size:24px; font-weight:700; margin-bottom:8px; color:#38BDF8; }
+  .subtitle { color:#64748B; font-size:13px; margin-bottom:32px; }
+  .tree-container { max-width:900px; }
+  .tree-node { position:relative; padding-left:28px; margin-bottom:4px; }
+  .tree-node::before { content:''; position:absolute; left:8px; top:0; bottom:-4px; border-left:1px solid #2A374D; }
+  .tree-node:last-child::before { bottom:50%; }
+  .tree-node::after { content:''; position:absolute; left:8px; top:14px; width:14px; border-top:1px solid #2A374D; }
+  .tree-node.root { padding-left:0; }
+  .tree-node.root::before, .tree-node.root::after { display:none; }
+  .node-content { display:inline-flex; align-items:center; gap:8px; padding:6px 14px; border-radius:8px; background:#0D131F; border:1px solid #2A374D; font-size:13px; transition:all .15s; cursor:default; }
+  .node-content:hover { border-color:#38BDF8; background:#141C2E; }
+  .node-content.page { border-color:#1E293B; }
+  .node-content.science { border-color:#38BDF8; color:#38BDF8; font-weight:600; }
+  .node-content.special { border-color:#A855F7; color:#A855F7; }
+  .node-content.admin { border-color:#F59E0B; color:#F59E0B; }
+  .badge { font-size:10px; padding:2px 8px; border-radius:99px; font-weight:600; }
+  .badge-count { background:rgba(56,189,248,0.12); color:#38BDF8; }
+  .badge-seo { background:rgba(16,185,129,0.12); color:#10B981; }
+  .badge-faq { background:rgba(245,158,11,0.12); color:#F59E0B; }
+  .badge-aff { background:rgba(168,85,247,0.12); color:#A855F7; }
+  .legend { display:flex; gap:16px; margin-bottom:24px; flex-wrap:wrap; }
+  .legend-item { display:flex; align-items:center; gap:6px; font-size:12px; color:#94A3B8; }
+  .legend-dot { width:12px; height:12px; border-radius:4px; border:1px solid; }
+  .section-label { font-size:11px; text-transform:uppercase; letter-spacing:0.08em; color:#64748B; margin:20px 0 8px; font-weight:600; }
+  .layout-diagram { margin-top:40px; padding:24px; background:#0D131F; border:1px solid #2A374D; border-radius:12px; }
+  .layout-diagram h2 { font-size:16px; color:#38BDF8; margin-bottom:16px; }
+  .layout-grid { display:grid; grid-template-columns:240px 1fr; gap:12px; min-height:400px; }
+  .layout-sidebar { background:#0D131F; border:1px solid #2A374D; border-radius:8px; padding:12px; }
+  .layout-main { background:#080C14; border:1px solid #2A374D; border-radius:8px; padding:12px; display:flex; flex-direction:column; gap:8px; }
+  .layout-box { background:#141C2E; border:1px solid #1E293B; border-radius:6px; padding:8px 12px; font-size:11px; color:#94A3B8; }
+  .layout-box.header { text-align:center; font-weight:600; color:#E2E8F0; }
+  .layout-box.seo { border-color:#10B981; color:#10B981; }
+  .layout-box.filters { display:flex; gap:8px; }
+  .layout-box.filters span { background:#0D131F; padding:2px 8px; border-radius:4px; font-size:10px; }
+  .layout-box.resource { display:flex; align-items:center; gap:8px; }
+  .layout-box.resource .dot { width:8px; height:8px; border-radius:50%; background:#38BDF8; }
+  .layout-box.footer { text-align:center; font-size:10px; color:#64748B; margin-top:auto; }
+  .layout-box.faq { border-color:#F59E0B; color:#F59E0B; }
+  .layout-sidebar h3 { font-size:11px; color:#64748B; margin-bottom:8px; text-transform:uppercase; }
+  .layout-sidebar .nav-item { font-size:11px; padding:3px 8px; border-radius:4px; margin-bottom:2px; color:#94A3B8; }
+  .layout-sidebar .nav-item.active { background:rgba(56,189,248,0.1); color:#38BDF8; }
+  .layout-sidebar .nav-sub { padding-left:16px; font-size:10px; }
+</style>
+</head>
+<body>
+<h1>PhysicURL — Site Architecture</h1>
+<p class="subtitle">541 resources across 7 sciences, 35+ subdisciplines, and 67 pages — Astro + React + Cloudflare</p>
+
+<div class="legend">
+  <div class="legend-item"><div class="legend-dot" style="border-color:#38BDF8;"></div> Science landing page (SEO)</div>
+  <div class="legend-item"><div class="legend-dot" style="border-color:#A855F7;"></div> Special (Supplies/Software)</div>
+  <div class="legend-item"><div class="legend-dot" style="border-color:#F59E0B;"></div> Admin / API</div>
+  <div class="legend-item"><div class="legend-dot" style="border-color:#1E293B;"></div> Subdiscipline page</div>
+</div>
+
+<div class="tree-container">
+
+  <!-- Root -->
+  <div class="tree-node root">
+    <div class="node-content science">🏠 PhysicURL — Homepage <span class="badge badge-count">541 resources</span> <span class="badge badge-seo">SEO</span></div>
+  </div>
+
+  <!-- Physics -->
+  <div class="tree-node">
+    <div class="node-content science">⚛️ Physics <span class="badge badge-count">208</span> <span class="badge badge-seo">SEO+FAQ</span></div>
+  </div>
+  <div class="tree-node"><div class="node-content">General Reference <span class="badge badge-count">55</span></div></div>
+  <div class="tree-node"><div class="node-content">Particle & High Energy <span class="badge badge-count">25</span></div></div>
+  <div class="tree-node"><div class="node-content">University Departments <span class="badge badge-count">27</span></div></div>
+  <div class="tree-node"><div class="node-content">Classical Mechanics <span class="badge badge-count">17</span></div></div>
+  <div class="tree-node"><div class="node-content">Quantum Mechanics <span class="badge badge-count">15</span></div></div>
+  <div class="tree-node"><div class="node-content">Optics & Photonics <span class="badge badge-count">14</span></div></div>
+  <div class="tree-node"><div class="node-content">Nuclear Physics <span class="badge badge-count">14</span></div></div>
+  <div class="tree-node"><div class="node-content">Condensed Matter <span class="badge badge-count">11</span></div></div>
+  <div class="tree-node"><div class="node-content">Thermodynamics <span class="badge badge-count">6</span></div></div>
+  <div class="tree-node"><div class="node-content">Fluid Dynamics <span class="badge badge-count">6</span></div></div>
+  <div class="tree-node"><div class="node-content">Electromagnetism <span class="badge badge-count">5</span></div></div>
+  <div class="tree-node"><div class="node-content special">📦 Supplies & Products <span class="badge badge-count">7</span> <span class="badge badge-aff">Affiliate</span></div></div>
+  <div class="tree-node"><div class="node-content special">🔧 Software Tools <span class="badge badge-count">5</span></div></div>
+
+  <!-- Chemistry -->
+  <div class="tree-node">
+    <div class="node-content science">⚗️ Chemistry <span class="badge badge-count">57</span> <span class="badge badge-seo">SEO+FAQ</span></div>
+  </div>
+  <div class="tree-node"><div class="node-content">Physical Chemistry <span class="badge badge-count">11</span></div></div>
+  <div class="tree-node"><div class="node-content">Chemical Databases <span class="badge badge-count">9</span></div></div>
+  <div class="tree-node"><div class="node-content">Analytical Chemistry <span class="badge badge-count">9</span></div></div>
+  <div class="tree-node"><div class="node-content">Organic Chemistry <span class="badge badge-count">8</span></div></div>
+  <div class="tree-node"><div class="node-content">Periodic Tables & Elements <span class="badge badge-count">8</span></div></div>
+  <div class="tree-node"><div class="node-content">General Reference <span class="badge badge-count">2</span></div></div>
+  <div class="tree-node"><div class="node-content special">📦 Supplies & Products <span class="badge badge-count">5</span> <span class="badge badge-aff">Affiliate</span></div></div>
+  <div class="tree-node"><div class="node-content special">🔧 Software Tools <span class="badge badge-count">5</span></div></div>
+
+  <!-- Astronomy -->
+  <div class="tree-node">
+    <div class="node-content science">🔭 Astronomy <span class="badge badge-count">110</span> <span class="badge badge-seo">SEO+FAQ</span></div>
+  </div>
+  <div class="tree-node"><div class="node-content">Observational Astronomy <span class="badge badge-count">26</span></div></div>
+  <div class="tree-node"><div class="node-content">Astrophysics & Cosmology <span class="badge badge-count">16</span></div></div>
+  <div class="tree-node"><div class="node-content">Space Missions & Agencies <span class="badge badge-count">13</span></div></div>
+  <div class="tree-node"><div class="node-content">Astronomical Databases <span class="badge badge-count">12</span></div></div>
+  <div class="tree-node"><div class="node-content">Planetary Science <span class="badge badge-count">6</span></div></div>
+  <div class="tree-node"><div class="node-content special">📦 Supplies & Products <span class="badge badge-count">4</span> <span class="badge badge-aff">Affiliate</span></div></div>
+  <div class="tree-node"><div class="node-content special">🔧 Software Tools <span class="badge badge-count">26</span></div></div>
+
+  <!-- Earth Sciences -->
+  <div class="tree-node">
+    <div class="node-content science">🌍 Earth Sciences <span class="badge badge-count">47</span> <span class="badge badge-seo">SEO+FAQ</span></div>
+  </div>
+  <div class="tree-node"><div class="node-content">Geology & Geophysics <span class="badge badge-count">13</span></div></div>
+  <div class="tree-node"><div class="node-content">Meteorology & Atmospheric <span class="badge badge-count">8</span></div></div>
+  <div class="tree-node"><div class="node-content">Oceanography <span class="badge badge-count">8</span></div></div>
+  <div class="tree-node"><div class="node-content">Climate Science <span class="badge badge-count">8</span></div></div>
+  <div class="tree-node"><div class="node-content">Environmental Science <span class="badge badge-count">5</span></div></div>
+  <div class="tree-node"><div class="node-content special">📦 Supplies & Products <span class="badge badge-count">2</span> <span class="badge badge-aff">Affiliate</span></div></div>
+  <div class="tree-node"><div class="node-content special">🔧 Software Tools <span class="badge badge-count">3</span></div></div>
+
+  <!-- Biophysics -->
+  <div class="tree-node">
+    <div class="node-content science">🧬 Biophysics <span class="badge badge-count">36</span> <span class="badge badge-seo">SEO+FAQ</span></div>
+  </div>
+  <div class="tree-node"><div class="node-content">Molecular Biophysics <span class="badge badge-count">17</span></div></div>
+  <div class="tree-node"><div class="node-content">Bioinformatics <span class="badge badge-count">11</span></div></div>
+  <div class="tree-node"><div class="node-content">Biomechanics <span class="badge badge-count">4</span></div></div>
+  <div class="tree-node"><div class="node-content special">📦 Supplies & Products <span class="badge badge-count">2</span> <span class="badge badge-aff">Affiliate</span></div></div>
+  <div class="tree-node"><div class="node-content special">🔧 Software Tools <span class="badge badge-count">2</span></div></div>
+
+  <!-- Materials Science -->
+  <div class="tree-node">
+    <div class="node-content science">🔬 Materials Science <span class="badge badge-count">45</span> <span class="badge badge-seo">SEO+FAQ</span></div>
+  </div>
+  <div class="tree-node"><div class="node-content">Crystallography <span class="badge badge-count">19</span></div></div>
+  <div class="tree-node"><div class="node-content">General Reference <span class="badge badge-count">10</span></div></div>
+  <div class="tree-node"><div class="node-content">Nanotechnology <span class="badge badge-count">7</span></div></div>
+  <div class="tree-node"><div class="node-content">Computational Materials <span class="badge badge-count">5</span></div></div>
+  <div class="tree-node"><div class="node-content special">📦 Supplies & Products <span class="badge badge-count">2</span> <span class="badge badge-aff">Affiliate</span></div></div>
+  <div class="tree-node"><div class="node-content special">🔧 Software Tools <span class="badge badge-count">2</span></div></div>
+
+  <!-- Mathematical Physics -->
+  <div class="tree-node">
+    <div class="node-content science">📐 Mathematical Physics <span class="badge badge-count">38</span> <span class="badge badge-seo">SEO+FAQ</span></div>
+  </div>
+  <div class="tree-node"><div class="node-content">Computational Tools <span class="badge badge-count">14</span></div></div>
+  <div class="tree-node"><div class="node-content">Reference Databases <span class="badge badge-count">10</span></div></div>
+  <div class="tree-node"><div class="node-content">General <span class="badge badge-count">9</span></div></div>
+  <div class="tree-node"><div class="node-content special">📦 Supplies & Products <span class="badge badge-count">3</span> <span class="badge badge-aff">Affiliate</span></div></div>
+  <div class="tree-node"><div class="node-content special">🔧 Software Tools <span class="badge badge-count">2</span></div></div>
+
+  <!-- Admin -->
+  <div class="tree-node">
+    <div class="node-content admin">⚙️ Admin Dashboard</div>
+  </div>
+  <div class="tree-node"><div class="node-content admin">POST /api/login</div></div>
+  <div class="tree-node"><div class="node-content admin">GET/POST /api/resources</div></div>
+  <div class="tree-node"><div class="node-content admin">POST /api/submit-link</div></div>
+  <div class="tree-node"><div class="node-content admin">POST /api/bulk-import</div></div>
+  <div class="tree-node"><div class="node-content admin">GET /api/submissions</div></div>
+  <div class="tree-node"><div class="node-content admin">GET /api/health-report</div></div>
+
+</div>
+
+<!-- Page Layout Diagram -->
+<div class="layout-diagram">
+  <h2>Page Layout (Science Landing Page)</h2>
+  <div class="layout-grid">
+    <div class="layout-sidebar">
+      <h3>Navigation</h3>
+      <div class="nav-item">🔍 Search...</div>
+      <div class="nav-item">Expand All / Collapse</div>
+      <div class="nav-item active">⚛️ Physics (208)</div>
+      <div class="nav-item nav-sub">Classical Mechanics (17)</div>
+      <div class="nav-item nav-sub">Quantum Mechanics (15)</div>
+      <div class="nav-item nav-sub">Software Tools (5)</div>
+      <div class="nav-item">⚗️ Chemistry (57)</div>
+      <div class="nav-item">🔭 Astronomy (110)</div>
+      <div class="nav-item">🌍 Earth Sciences (47)</div>
+      <div class="nav-item">🧬 Biophysics (36)</div>
+      <div class="nav-item">🔬 Materials Science (45)</div>
+      <div class="nav-item">📐 Math Physics (38)</div>
+    </div>
+    <div class="layout-main">
+      <div class="layout-box header">Breadcrumb: PhysicURL / Astronomy & Astrophysics | 110 resources · 6 verified · 98 free</div>
+      <div class="layout-box">H1: Astronomy & Astrophysics — Description paragraph</div>
+      <div class="layout-box seo">▾ About Astronomy (collapsed SEO panel — intro + key concepts)</div>
+      <div class="layout-box filters">
+        <span>Access ▾</span><span>Type ▾</span><span>Verified ▾</span><span>Deals ▾</span><span>Sort ▾</span><span>110 resources</span>
+      </div>
+      <div class="layout-box resource"><div class="dot"></div> NASA ADS — ui.adsabs.harvard.edu — Free · ★4.9</div>
+      <div class="layout-box resource"><div class="dot"></div> NASA Exoplanet Archive — exoplanetarchive.ipac.caltech.edu — Free · ★4.8</div>
+      <div class="layout-box resource"><div class="dot"></div> MAST Archive — mast.stsci.edu — Free · ★4.8</div>
+      <div class="layout-box resource"><div class="dot"></div> Stellarium — stellarium.org — Free · ★4.9</div>
+      <div class="layout-box resource"><div class="dot"></div> ... (106 more)</div>
+      <div class="layout-box faq">FAQ Section (4 questions — JSON-LD structured data)</div>
+      <div class="layout-box footer">PhysicURL · 541 resources · Affiliate Disclaimer · Submit a Link · Admin</div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,20 @@
+---
+import DirectoryLayout from '../../layouts/DirectoryLayout.astro';
+import AdminDashboard from '../../components/AdminDashboard.jsx';
+import { loadResources, buildTree } from '../../lib/data';
+
+const resources = loadResources();
+const tree = buildTree(resources);
+---
+<DirectoryLayout
+  title="Admin Dashboard"
+  description="Manage submissions, resources, and run URL health checks."
+  breadcrumb={[{ label: 'PhysicURL', href: '/' }, { label: 'Admin' }]}
+  tree={tree}
+  currentPath="/admin/"
+  totalCount={resources.length}
+>
+  <div class="admin-page">
+    <AdminDashboard client:load />
+  </div>
+</DirectoryLayout>

@@ -1,0 +1,179 @@
+---
+import { compile } from 'sass';
+import { readFileSync } from 'fs';
+import { join } from 'path';
+import SubmitModal from '../components/SubmitModal.jsx';
+
+// Compile SCSS at build time — single source, no duplicates
+const scssPath = join(process.cwd(), 'src', 'styles', 'global.scss');
+const cssContent = compile(scssPath, { style: 'compressed', charset: false }).css.replace(/^\uFEFF/, '');
+
+interface Props {
+  title: string;
+  description: string;
+  breadcrumb: { label: string; href?: string }[];
+  tree: any[];
+  currentPath: string;
+  totalCount: number;
+  children: any;
+}
+
+const { title, description, breadcrumb, tree, currentPath, totalCount, children } = Astro.props;
+
+// JSON-LD
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'CollectionPage',
+  name: title,
+  description: description.slice(0, 200),
+  url: `https://physicurl.pplx.app${currentPath}`,
+};
+---
+
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{title} — PhysicURL</title>
+  <meta name="description" content={description.slice(0, 160)} />
+  <meta name="keywords" content="physics, science, directory, research, education" />
+  <meta property="og:title" content={`${title} — PhysicURL`} />
+  <meta property="og:description" content={description.slice(0, 200)} />
+  <meta property="og:type" content="website" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <link rel="canonical" href={`https://physicurl.pplx.app${currentPath}`} />
+  <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 28'><circle cx='14' cy='14' r='2' fill='%2338BDF8'/><ellipse cx='14' cy='14' rx='11' ry='4' fill='none' stroke='%2338BDF8' stroke-width='1.5'/><ellipse cx='14' cy='14' rx='11' ry='4' fill='none' stroke='%2338BDF8' stroke-width='1.5' transform='rotate(60 14 14)'/><ellipse cx='14' cy='14' rx='11' ry='4' fill='none' stroke='%2338BDF8' stroke-width='1.5' transform='rotate(120 14 14)'/></svg>" />
+  <style is:global set:html={cssContent}></style>
+</head>
+<body>
+  <div class="app">
+    <div class="mobile-overlay"></div>
+
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <a href="/">
+          <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+            <circle cx="14" cy="14" r="2" fill="#38BDF8" />
+            <ellipse cx="14" cy="14" rx="11" ry="4" stroke="#38BDF8" stroke-width="1.5" />
+            <ellipse cx="14" cy="14" rx="11" ry="4" stroke="#38BDF8" stroke-width="1.5" transform="rotate(60 14 14)" />
+            <ellipse cx="14" cy="14" rx="11" ry="4" stroke="#38BDF8" stroke-width="1.5" transform="rotate(120 14 14)" />
+          </svg>
+          <span>PhysicURL</span>
+        </a>
+        <div class="sidebar-search">
+          <span class="search-icon">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+          </span>
+          <input type="text" id="sidebar-search" placeholder="Search resources..." />
+        </div>
+      </div>
+      <div class="sidebar-controls">
+        <button id="expand-all">Expand All</button>
+        <button id="collapse-all">Collapse All</button>
+      </div>
+      <nav class="tree-nav" id="tree-nav">
+        {tree.map(sci => (
+          <div class="tree-science" data-science={sci.slug}>
+            <a href={`/${sci.slug}.html`} class="tree-science-header" onclick={`toggleScience('${sci.slug}')`}>
+              <span class="chevron">▶</span>
+              <span class="tree-science-name" style="flex:1">{sci.name}</span>
+              <span class="tree-science-count">{sci.count}</span>
+            </a>
+            <div class="tree-sub">
+              {sci.subdisciplines.map(sub => (
+                <a href={`/${sci.slug}/${sub.slug}.html`} class={currentPath === `/${sci.slug}/${sub.slug}` ? 'active' : ''}>
+                  {sub.name}
+                  <span class="count">{sub.count}</span>
+                </a>
+              ))}
+            </div>
+          </div>
+        ))}
+      </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main">
+      <header class="topbar">
+        <button class="mobile-menu-btn" onclick="document.getElementById('sidebar').classList.toggle('open');document.querySelector('.mobile-overlay').classList.toggle('open')" aria-label="Menu">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+        </button>
+        <nav class="breadcrumb">
+          {breadcrumb.map((crumb, i) => (
+            <>
+              {i > 0 && <span class="separator">/</span>}
+              {crumb.href ? <a href={crumb.href}>{crumb.label}</a> : <span class="current">{crumb.label}</span>}
+            </>
+          ))}
+        </nav>
+        <div class="topbar-stats">
+          <span><span class="stat-value">{totalCount}</span> resources</span>
+          <SubmitModal client:load />
+        </div>
+      </header>
+
+      <section class="scope-header">
+        <h1>{title}</h1>
+        <p class="scope-description">{description}</p>
+        <div class="scope-meta">
+          <span>
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+            {totalCount} indexed
+          </span>
+        </div>
+      </section>
+
+      <slot />
+
+      <footer class="footer">
+        <p>PhysicURL — Scientific Reference Index & Knowledge Directory | {totalCount} curated resources across 7 scientific fields</p>
+        <p style="margin-top:4px;">
+          Resources are verified and curated.
+          <a href="/">Browse all sciences</a> |
+          <a href="#" class="submit-link-btn" style="display:inline-flex;font-size:12px;padding:4px 12px;">+ Submit a Link</a> |
+          <a href="/admin/">Admin</a>
+        </p>
+        <p class="affiliate-disclaimer">PhysicURL is a participant in the Amazon Associates Program. Links marked as affiliate may earn a commission on qualifying purchases at no extra cost to you. All affiliate links are disclosed with an "Affiliate" badge.</p>
+      </footer>
+    </main>
+  </div>
+
+  <script is:inline>
+    function navigateToScience(slug) {
+      const el = document.querySelector(`[data-science="${slug}"]`);
+      if (el) el.classList.add('open');
+      window.location.href = '/' + slug + '.html';
+    }
+    function toggleScience(slug) {
+      const el = document.querySelector(`[data-science="${slug}"]`);
+      if (el) el.classList.toggle('open');
+    }
+    document.getElementById('expand-all').addEventListener('click', () => {
+      document.querySelectorAll('.tree-science').forEach(el => el.classList.add('open'));
+    });
+    document.getElementById('collapse-all').addEventListener('click', () => {
+      document.querySelectorAll('.tree-science').forEach(el => el.classList.remove('open'));
+    });
+    document.getElementById('sidebar-search').addEventListener('input', (e) => {
+      const q = e.target.value.toLowerCase();
+      document.querySelectorAll('.tree-science').forEach(el => {
+        const text = el.textContent.toLowerCase();
+        el.style.display = q === '' || text.includes(q) ? '' : 'none';
+      });
+    });
+    // Open current science in tree
+    const currentPath = window.location.pathname.replace(/\.html$/, '').replace(/\/$/, '');
+    const sciMatch = currentPath.match(/^\/([^\/]+)/);
+    if (sciMatch) {
+      const el = document.querySelector(`[data-science="${sciMatch[1]}"]`);
+      if (el) el.classList.add('open');
+    }
+  </script>
+</body>
+</html>
