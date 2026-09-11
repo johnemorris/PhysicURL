@@ -1,0 +1,24 @@
+---
+import DirectoryLayout from '../../layouts/DirectoryLayout.astro';
+import AstroWizard from '../../components/AstroWizard.jsx';
+import { loadResources, buildTree, SCIENCES } from '../../lib/data';
+
+const resources = loadResources();
+const tree = buildTree(resources);
+const astronomy = SCIENCES.find(s => s.slug === 'astronomy');
+const astroCount = resources.filter(r => r.science === 'astronomy').length;
+---
+<DirectoryLayout
+  title="Telescope & Gear Wizard — Astronomy — PhysicURL"
+  description="Answer 4 quick questions and design your perfect telescope build — optical tube, mount, eyepieces, filters, and dark-sky essentials with vetted vendor links."
+  breadcrumb={[
+    { label: 'PhysicURL', href: '/' },
+    { label: astronomy.name, href: '/astronomy.html' },
+    { label: 'Telescope Wizard' },
+  ]}
+  tree={tree}
+  currentPath="/astronomy/wizard"
+  totalCount={astroCount}
+>
+  <AstroWizard client:load />
+</DirectoryLayout>
