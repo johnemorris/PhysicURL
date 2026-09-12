@@ -20,5 +20,7 @@ const astroCount = resources.filter(r => r.science === 'astronomy').length;
   currentPath="/astronomy/wizard"
   totalCount={astroCount}
 >
-  <AstroWizard client:load />
+  <div class="wizard-page">
+    <AstroWizard client:load />
+  </div>
 </DirectoryLayout>

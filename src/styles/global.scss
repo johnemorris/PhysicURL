@@ -1,6 +1,11 @@
 // ============================================
 // PhysicURL — Deep Dark Matter / Quantum Terminal
-// Single SCSS source, no duplicates
+// Single SCSS source. All colors/fonts should
+// reference the design tokens below (never
+// hardcode a hex value or font stack elsewhere
+// in this file) and each selector should only
+// be declared once — extend it in place instead
+// of re-opening the block further down the file.
 // ============================================
 
 // --- Design Tokens ---
@@ -1377,7 +1382,8 @@ ul, ol { list-style: none; }
 }
 
 // ===== Wizard page shell =====
-.chem-wizard-page {
+// Shared by both the chemistry and astronomy wizard pages.
+.wizard-page {
   padding: 8px 0 40px;
 }
 
@@ -1455,6 +1461,11 @@ ul, ol { list-style: none; }
           height: 8px;
           border-radius: 50%;
           flex-shrink: 0;
+
+          &.dot-primary { background: var(--color-primary); }
+          &.dot-emerald { background: var(--color-emerald); }
+          &.dot-amber { background: var(--color-amber); }
+          &.dot-purple { background: var(--color-purple); }
         }
       }
     }
@@ -1685,6 +1696,24 @@ ul, ol { list-style: none; }
 
       &:hover { color: var(--color-text); border-color: var(--color-primary); }
     }
+
+    .lab-tools {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+
+      .lab-badge {
+        font-family: var(--font-mono);
+        font-size: 0.55rem;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+        color: var(--color-primary);
+        background: var(--color-primary-bg);
+        border: 1px solid rgba(56, 189, 248, 0.2);
+        border-radius: 4px;
+        padding: 0.18rem 0.45rem;
+      }
+    }
   }
 
   .lab-canvas {
@@ -1701,6 +1730,19 @@ ul, ol { list-style: none; }
     svg { width: 100%; height: 100%; }
 
     &.paused * { animation-play-state: paused !important; }
+
+    .flame-flicker {
+      animation: flame-flicker 0.35s ease-in-out infinite alternate;
+      transform-origin: center bottom;
+    }
+    .spin-bar {
+      animation: spin-slow 0.4s linear infinite;
+    }
+    .steam {
+      animation: steam-rise 4.2s ease-out infinite;
+      opacity: 0;
+    }
+    .steam-group { pointer-events: none; }
   }
 
   .lab-metrics {
@@ -1769,9 +1811,13 @@ ul, ol { list-style: none; }
   to   { opacity: 1; }
 }
 
+// Note: transform-origin is intentionally NOT baked in here — every usage
+// (chem .lab-canvas, astro .obs-canvas, and individual SVG elements) sets its
+// own transform-origin via a class or inline style, since the rotation
+// center differs per diagram.
 @keyframes spin-slow {
-  0%   { transform: rotate(0deg); transform-origin: 200px 130px; }
-  100% { transform: rotate(360deg); transform-origin: 200px 130px; }
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
 }
 
 .lab-canvas {
@@ -1945,36 +1991,12 @@ ul, ol { list-style: none; }
     box-shadow: 0 0 24px rgba(168, 85, 247, 0.15);
   }
 
-  .wizard-cta-icon { color: #A855F7; }
-}
-
-.astro-wizard-page {
-  padding-block: 1.5rem 3rem;
-
-  .wizard-workspace.astro {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    grid-template-areas:
-      "left right"
-      "checklist checklist";
-    gap: 1.75rem;
-
-    > .wizard-left { grid-area: left; }
-    > .wizard-right { grid-area: right; }
-    > .wizard-checklist { grid-area: checklist; }
-  }
-
-  @media (max-width: 1024px) {
-    .wizard-workspace.astro {
-      grid-template-columns: 1fr;
-      grid-template-areas: "left" "right" "checklist";
-    }
-  }
+  .wizard-cta-icon { color: var(--color-purple); }
 }
 
 /* Observation Deck */
 .obs-deck {
-  background: linear-gradient(180deg, #0D131F 0%, #080C14 100%);
+  background: linear-gradient(180deg, var(--color-surface) 0%, var(--color-canvas) 100%);
   border: 1px solid rgba(56, 189, 248, 0.15);
   border-radius: 14px;
   padding: 1.25rem;
@@ -1990,17 +2012,17 @@ ul, ol { list-style: none; }
     align-items: center;
 
     .obs-title {
-      font-family: 'JetBrains Mono', ui-monospace, monospace;
+      font-family: var(--font-mono);
       font-size: 0.7rem;
       letter-spacing: 0.18em;
       text-transform: uppercase;
-      color: #A855F7;
+      color: var(--color-purple);
     }
 
     .pause-btn {
       background: rgba(56, 189, 248, 0.08);
       border: 1px solid rgba(56, 189, 248, 0.25);
-      color: #38BDF8;
+      color: var(--color-primary);
       width: 28px;
       height: 28px;
       border-radius: 6px;
@@ -2015,7 +2037,7 @@ ul, ol { list-style: none; }
   }
 
   .obs-canvas {
-    background: #020617;
+    background: var(--color-canvas);
     border: 1px solid rgba(56, 189, 248, 0.12);
     border-radius: 10px;
     overflow: hidden;
@@ -2047,22 +2069,22 @@ ul, ol { list-style: none; }
       padding: 0.6rem 0.75rem;
 
       .metric-label {
-        font-family: 'JetBrains Mono', ui-monospace, monospace;
+        font-family: var(--font-mono);
         font-size: 0.6rem;
         letter-spacing: 0.14em;
         text-transform: uppercase;
-        color: #64748b;
+        color: var(--color-text-faint);
         margin-bottom: 0.3rem;
       }
 
       .metric-value {
-        font-family: 'JetBrains Mono', ui-monospace, monospace;
+        font-family: var(--font-mono);
         font-weight: 600;
         font-size: 0.95rem;
-        color: #e2e8f0;
+        color: var(--color-text);
 
-        &.primary { color: #38BDF8; }
-        &.accent { color: #A855F7; font-size: 0.8rem; }
+        &.primary { color: var(--color-primary); }
+        &.accent { color: var(--color-purple); font-size: 0.8rem; }
       }
     }
   }
@@ -2074,21 +2096,21 @@ ul, ol { list-style: none; }
 
     .inv-group {
       background: rgba(20, 28, 46, 0.4);
-      border-left: 3px solid #38BDF8;
+      border-left: 3px solid var(--color-primary);
       border-radius: 6px;
       padding: 0.65rem 0.8rem;
       animation: fade-in 0.4s ease-out;
 
-      &.tone-emerald { border-left-color: #10B981; }
-      &.tone-purple { border-left-color: #A855F7; }
-      &.tone-amber { border-left-color: #F59E0B; }
+      &.tone-emerald { border-left-color: var(--color-emerald); }
+      &.tone-purple { border-left-color: var(--color-purple); }
+      &.tone-amber { border-left-color: var(--color-amber); }
 
       .inv-label {
-        font-family: 'JetBrains Mono', ui-monospace, monospace;
+        font-family: var(--font-mono);
         font-size: 0.6rem;
         letter-spacing: 0.14em;
         text-transform: uppercase;
-        color: #64748b;
+        color: var(--color-text-faint);
         margin-bottom: 0.4rem;
       }
 
@@ -2101,115 +2123,31 @@ ul, ol { list-style: none; }
           .inv-name {
             font-size: 0.82rem;
             font-weight: 600;
-            color: #e2e8f0;
+            color: var(--color-text);
           }
           .inv-spec {
             font-size: 0.72rem;
-            color: #94a3b8;
+            color: var(--color-text-muted);
             margin-top: 0.1rem;
           }
         }
       }
     }
   }
-}
 
-/* Intro screen (astronomy) */
-.astro-wizard-page .wizard-intro {
-  max-width: 780px;
-  margin: 3rem auto;
-  text-align: center;
-
-  .intro-badge {
-    display: inline-block;
-    padding: 0.35rem 0.85rem;
-    border: 1px solid rgba(168, 85, 247, 0.35);
-    background: rgba(168, 85, 247, 0.06);
-    border-radius: 999px;
-    font-family: 'JetBrains Mono', ui-monospace, monospace;
-    font-size: 0.7rem;
-    letter-spacing: 0.16em;
-    text-transform: uppercase;
-    color: #A855F7;
-    margin-bottom: 1.5rem;
-  }
-
-  h1 {
-    font-size: clamp(2rem, 4vw, 3.4rem);
-    font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
-    font-weight: 700;
-    background: linear-gradient(135deg, #38BDF8 0%, #A855F7 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    margin-bottom: 1rem;
-    line-height: 1.1;
-  }
-
-  .lede {
-    font-size: 1.05rem;
-    color: #94a3b8;
-    max-width: 600px;
-    margin: 0 auto 1.75rem;
-    line-height: 1.6;
-  }
-
-  .intro-features {
-    display: flex;
-    gap: 1.5rem;
-    justify-content: center;
-    flex-wrap: wrap;
-    margin-bottom: 2rem;
-    color: #64748b;
-    font-family: 'JetBrains Mono', ui-monospace, monospace;
-    font-size: 0.78rem;
-  }
-
-  .start-btn {
-    background: linear-gradient(135deg, #38BDF8, #A855F7);
-    color: #020617;
-    font-weight: 700;
-    font-size: 0.95rem;
-    padding: 0.85rem 2rem;
-    border: none;
-    border-radius: 10px;
-    cursor: pointer;
-    transition: transform 0.15s ease, box-shadow 0.2s ease;
-
-    &:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 8px 24px rgba(168, 85, 247, 0.35);
-    }
-  }
-}
-
-@keyframes twinkle {
-  0%, 100% { opacity: 0.35; }
-  50% { opacity: 1; }
-}
-@keyframes nebula-pulse {
-  0%, 100% { opacity: 0.65; }
-  50% { opacity: 1; }
-}
-@keyframes spin-slow {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
-}
-
-/* Astronomy — refined animation additions */
-.obs-deck {
+  // --- refined animation additions (badges, disclosure, extra canvas fx) ---
   .obs-toolbar .obs-tools {
     display: flex;
     align-items: center;
     gap: 0.5rem;
 
     .obs-badge {
-      font-family: 'JetBrains Mono', ui-monospace, monospace;
+      font-family: var(--font-mono);
       font-size: 0.55rem;
       letter-spacing: 0.16em;
       text-transform: uppercase;
-      color: #38BDF8;
-      background: rgba(56, 189, 248, 0.08);
+      color: var(--color-primary);
+      background: var(--color-primary-bg);
       border: 1px solid rgba(56, 189, 248, 0.2);
       border-radius: 4px;
       padding: 0.18rem 0.45rem;
@@ -2229,7 +2167,7 @@ ul, ol { list-style: none; }
 
   .obs-disclosure {
     font-size: 0.68rem;
-    color: #64748b;
+    color: var(--color-text-faint);
     text-align: center;
     line-height: 1.4;
     padding: 0.6rem 0.4rem 0.1rem;
@@ -2252,47 +2190,16 @@ ul, ol { list-style: none; }
   100% { opacity: 0; transform: translate(-120px, 80px); }
 }
 
-/* Chemistry — refined animation additions */
-.lab-preview {
-  .lab-preview-toolbar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-
-    .lab-tools {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-
-      .lab-badge {
-        font-family: 'JetBrains Mono', ui-monospace, monospace;
-        font-size: 0.55rem;
-        letter-spacing: 0.16em;
-        text-transform: uppercase;
-        color: #38BDF8;
-        background: rgba(56, 189, 248, 0.08);
-        border: 1px solid rgba(56, 189, 248, 0.2);
-        border-radius: 4px;
-        padding: 0.18rem 0.45rem;
-      }
-    }
-  }
-
-  .lab-canvas {
-    .flame-flicker {
-      animation: flame-flicker 0.35s ease-in-out infinite alternate;
-      transform-origin: center bottom;
-    }
-    .spin-bar {
-      animation: spin-slow 0.4s linear infinite;
-    }
-    .steam {
-      animation: steam-rise 4.2s ease-out infinite;
-      opacity: 0;
-    }
-    .steam-group { pointer-events: none; }
-  }
+@keyframes twinkle {
+  0%, 100% { opacity: 0.35; }
+  50% { opacity: 1; }
 }
+@keyframes nebula-pulse {
+  0%, 100% { opacity: 0.65; }
+  50% { opacity: 1; }
+}
+// spin-slow is defined once, above, and shared by both the chemistry
+// lab canvas and the astronomy observation deck.
 
 @keyframes flame-flicker {
   0% { transform: scaleY(1) scaleX(1); opacity: 0.85; }
