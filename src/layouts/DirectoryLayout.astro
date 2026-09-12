@@ -1,13 +1,12 @@
 ---
 import { compile } from 'sass';
+import { readFileSync } from 'fs';
 import { join } from 'path';
 import SubmitModal from '../components/SubmitModal.jsx';
-
 
 // Compile SCSS at build time — single source, no duplicates
 const scssPath = join(process.cwd(), 'src', 'styles', 'global.scss');
 const cssContent = compile(scssPath, { style: 'compressed', charset: false }).css.replace(/^\uFEFF/, '');
-
 
 interface Props {
   title: string;
@@ -19,9 +18,7 @@ interface Props {
   children: any;
 }
 
-
 const { title, description, breadcrumb, tree, currentPath, totalCount, children } = Astro.props;
-
 
 // JSON-LD
 const jsonLd = {
@@ -32,7 +29,6 @@ const jsonLd = {
   url: `https://physicurl.pplx.app${currentPath}`,
 };
 ---
-
 
 <!DOCTYPE html>
 <html lang="en" data-theme="dark">
@@ -77,26 +73,25 @@ const jsonLd = {
           <input type="text" id="sidebar-search" placeholder="Search resources..." />
         </div>
       </div>
-
       <div class="sidebar-controls">
         <button id="expand-all">Expand All</button>
         <button id="collapse-all">Collapse All</button>
       </div>
-
       <nav class="tree-nav" id="tree-nav">
         {tree.map(sci => (
           <div class="tree-science" data-science={sci.slug}>
-            <button
-              type="button"
-              class="tree-science-header"
-              aria-expanded="false"
-              onclick={`toggleScience('${sci.slug}', this)`}
-            >
-              <span class="chevron">▶</span>
-              <span class="tree-science-name" style="flex:1">{sci.name}</span>
+            <div class="tree-science-header">
+              <button
+                type="button"
+                class="tree-science-toggle"
+                data-science-toggle={sci.slug}
+                aria-expanded="false"
+              >
+                <span class="chevron">▶</span>
+              </button>
+              <a href={`/${sci.slug}.html`} class="tree-science-link" style="flex:1">{sci.name}</a>
               <span class="tree-science-count">{sci.count}</span>
-            </button>
-
+            </div>
             <div class="tree-sub">
               {sci.subdisciplines.map(sub => (
                 <a href={`/${sci.slug}/${sub.slug}.html`} class={currentPath === `/${sci.slug}/${sub.slug}` ? 'active' : ''}>
@@ -116,7 +111,6 @@ const jsonLd = {
         <button class="mobile-menu-btn" onclick="document.getElementById('sidebar').classList.toggle('open');document.querySelector('.mobile-overlay').classList.toggle('open')" aria-label="Menu">
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
         </button>
-
         <nav class="breadcrumb">
           {breadcrumb.map((crumb, i) => (
             <>
@@ -125,7 +119,6 @@ const jsonLd = {
             </>
           ))}
         </nav>
-
         <div class="topbar-stats">
           <span><span class="stat-value">{totalCount}</span> resources</span>
           <SubmitModal client:load />
@@ -164,48 +157,44 @@ const jsonLd = {
       if (el) el.classList.add('open');
       window.location.href = '/' + slug + '.html';
     }
-
-    function toggleScience(slug, button) {
-      const el = document.querySelector(`[data-science="${slug}"]`);
-      if (!el) return;
-
-      const isOpen = el.classList.toggle('open');
-      button.setAttribute('aria-expanded', String(isOpen));
-    }
-
     document.getElementById('expand-all').addEventListener('click', () => {
       document.querySelectorAll('.tree-science').forEach(el => {
         el.classList.add('open');
-        el.querySelector('.tree-science-header')?.setAttribute('aria-expanded', 'true');
+        el.querySelector('.tree-science-toggle')?.setAttribute('aria-expanded', 'true');
       });
     });
-
     document.getElementById('collapse-all').addEventListener('click', () => {
       document.querySelectorAll('.tree-science').forEach(el => {
         el.classList.remove('open');
-        el.querySelector('.tree-science-header')?.setAttribute('aria-expanded', 'false');
+        el.querySelector('.tree-science-toggle')?.setAttribute('aria-expanded', 'false');
       });
     });
-
     document.getElementById('sidebar-search').addEventListener('input', (e) => {
       const q = e.target.value.toLowerCase();
-
       document.querySelectorAll('.tree-science').forEach(el => {
         const text = el.textContent.toLowerCase();
         el.style.display = q === '' || text.includes(q) ? '' : 'none';
       });
     });
-
-    // Open the directory corresponding to the current page.
+    document.getElementById('tree-nav').addEventListener('click', (e) => {
+      const toggle = e.target.closest('[data-science-toggle]');
+      if (toggle) {
+        e.preventDefault();
+        e.stopPropagation();
+        const slug = toggle.dataset.scienceToggle;
+        const el = document.querySelector(`[data-science="${slug}"]`);
+        if (!el) return;
+        const isOpen = el.classList.toggle('open');
+        toggle.setAttribute('aria-expanded', String(isOpen));
+      }
+    });
     const currentPath = window.location.pathname.replace(/\.html$/, '').replace(/\/$/, '');
     const sciMatch = currentPath.match(/^\/([^\/]+)/);
-
     if (sciMatch) {
       const el = document.querySelector(`[data-science="${sciMatch[1]}"]`);
-
       if (el) {
         el.classList.add('open');
-        el.querySelector('.tree-science-header')?.setAttribute('aria-expanded', 'true');
+        el.querySelector('.tree-science-toggle')?.setAttribute('aria-expanded', 'true');
       }
     }
   </script>

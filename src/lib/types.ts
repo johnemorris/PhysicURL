@@ -8,13 +8,14 @@ export interface Resource {
   subdiscipline: string;
   resourceType: string;
   access: string;
-  rating: number;
-  yearEstablished: string;
+  rating: number | null;
+  yearEstablished: string | number;
   tags: string[];
   isVerified: boolean;
   isCurated: boolean;
   featured: boolean;
   isAffiliate: boolean;
+  addedDate?: string;
 }
 
 export interface ScienceConfig {

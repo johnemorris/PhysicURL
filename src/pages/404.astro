@@ -1,0 +1,269 @@
+---
+import DirectoryLayout from '../layouts/DirectoryLayout.astro';
+import { loadResources, buildTree, SCIENCES } from '../lib/data-node';
+
+const resources = loadResources();
+const tree = buildTree(resources);
+---
+
+<DirectoryLayout
+  title="Page Not Found"
+  description="The requested page could not be found on PhysicURL."
+  breadcrumb={[{ label: 'PhysicURL', href: '/' }, { label: '404' }]}
+  tree={tree}
+  currentPath="/404"
+  totalCount={resources.length}
+>
+  <div class="not-found-page">
+    <div class="not-found-content">
+      <div class="not-found-code">404</div>
+      <h1>Page Not Found</h1>
+      <p class="not-found-message">
+        The resource you're looking for doesn't exist or has been moved. 
+        Our directory contains 500+ curated scientific resources across 7 fields — 
+        it's likely what you need is still here, just at a different URL.
+      </p>
+      
+      <div class="not-found-actions">
+        <a href="/" class="btn-primary btn-lg">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 8px;">
+            <path d="M10 19l-7-7 7-7" />
+            <path d="M17 12H7" />
+          </svg>
+          Return to Homepage
+        </a>
+        <a href="/sitemap.html" class="btn-secondary btn-lg">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 8px;">
+            <rect x="3" y="3" width="7" height="7" rx="1" />
+            <rect x="14" y="3" width="7" height="7" rx="1" />
+            <rect x="3" y="14" width="7" height="7" rx="1" />
+            <rect x="14" y="14" width="7" height="7" rx="1" />
+          </svg>
+          Browse Sitemap
+        </a>
+      </div>
+
+      <div class="not-found-suggestions">
+        <h3>Popular Science Directories</h3>
+        <div class="science-quick-links">
+          {SCIENCES.map(sci => (
+            <a href={`/${sci.slug}.html`} class="quick-link" data-science={sci.slug}>
+              <span class="quick-link-icon">{sci.icon === 'atom' && '⚛' || sci.icon === 'flask' && '⚗' || sci.icon === 'telescope' && '🔭' || sci.icon === 'globe' && '🌍' || sci.icon === 'dna' && '🧬' || sci.icon === 'crystal' && '💎' || sci.icon === 'sigma' && 'Σ'}</span>
+              <span class="quick-link-name">{sci.name}</span>
+            </a>
+          ))}
+        </div>
+      </div>
+
+      <div class="not-found-search">
+        <form action="/search" method="GET" class="search-form">
+          <label for="search-q" class="visually-hidden">Search resources</label>
+          <input 
+            type="search" 
+            id="search-q" 
+            name="q" 
+            placeholder="Search physics, chemistry, astronomy..." 
+            class="search-input"
+          />
+          <button type="submit" class="search-submit">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="11" cy="11" r="8"/>
+              <path d="m21 21-4.3-4.3"/>
+            </svg>
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+</DirectoryLayout>
+
+<style>
+  .not-found-page {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 60vh;
+    padding: 48px 24px;
+  }
+
+  .not-found-content {
+    text-align: center;
+    max-width: 520px;
+    width: 100%;
+  }
+
+  .not-found-code {
+    font-size: 96px;
+    font-weight: 800;
+    line-height: 1;
+    color: var(--color-primary);
+    font-family: var(--font-mono);
+    letter-spacing: -0.04em;
+    margin-bottom: 16px;
+    opacity: 0.9;
+  }
+
+  .not-found-content h1 {
+    font-size: 28px;
+    font-weight: 700;
+    margin-bottom: 16px;
+    color: var(--color-text);
+  }
+
+  .not-found-message {
+    font-size: 15px;
+    color: var(--color-text-muted);
+    line-height: 1.7;
+    margin-bottom: 32px;
+  }
+
+  .not-found-actions {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-bottom: 40px;
+  }
+
+  .btn-lg {
+    font-size: 14px;
+    padding: 12px 24px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .not-found-suggestions {
+    padding-top: 32px;
+    border-top: 1px solid var(--color-border-light);
+    margin-bottom: 32px;
+  }
+
+  .not-found-suggestions h3 {
+    font-size: 13px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--color-text-faint);
+    margin-bottom: 16px;
+  }
+
+  .science-quick-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: center;
+  }
+
+  .quick-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 14px;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: 8px;
+    color: var(--color-text-muted);
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 500;
+    transition: all 0.15s;
+  }
+
+  .quick-link:hover {
+    border-color: var(--color-primary);
+    color: var(--color-primary);
+    background: var(--color-primary-bg);
+  }
+
+  .quick-link-icon {
+    font-size: 14px;
+  }
+
+  .not-found-search {
+    max-width: 400px;
+    margin: 0 auto;
+  }
+
+  .search-form {
+    display: flex;
+    gap: 8px;
+  }
+
+  .search-input {
+    flex: 1;
+    padding: 12px 16px;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: 8px;
+    color: var(--color-text);
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.15s;
+  }
+
+  .search-input:focus {
+    border-color: var(--color-primary);
+  }
+
+  .search-input::placeholder {
+    color: var(--color-text-faint);
+  }
+
+  .search-submit {
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--color-primary);
+    color: #001220;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+
+  .search-submit:hover {
+    background: #7dd3fc;
+  }
+
+  .visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+
+  @media (max-width: 640px) {
+    .not-found-code {
+      font-size: 64px;
+    }
+
+    .not-found-content h1 {
+      font-size: 22px;
+    }
+
+    .not-found-message {
+      font-size: 14px;
+    }
+
+    .btn-lg {
+      padding: 10px 18px;
+      font-size: 13px;
+    }
+
+    .search-form {
+      flex-direction: column;
+    }
+
+    .search-submit {
+      width: 100%;
+    }
+  }
+</style>

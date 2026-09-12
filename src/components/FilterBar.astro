@@ -1,0 +1,133 @@
+---
+interface Props {
+  initialCount: number;
+  resourceTypeLabels?: Record<string, string>;
+  accessLabels?: Record<string, string>;
+  showSearch?: boolean;
+  searchPlaceholder?: string;
+  searchId?: string;
+}
+
+const {
+  initialCount,
+  resourceTypeLabels = {},
+  accessLabels = {},
+  showSearch = false,
+  searchPlaceholder = 'Search resources...',
+  searchId = 'scoped-search',
+} = Astro.props;
+---
+
+<div class="filter-bar">
+  {showSearch && (
+    <div class="filter-group search-group">
+      <label>Search</label>
+      <div class="scoped-search">
+        <span class="scoped-search-icon">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+        </span>
+        <input type="text" id={searchId} placeholder={searchPlaceholder} />
+      </div>
+    </div>
+  )}
+  <div class="filter-group">
+    <label>Access</label>
+    <select id="filter-access">
+      <option value="all">All Access</option>
+      <option value="free">Free</option>
+      <option value="paid">Paid</option>
+      <option value="freemium">Freemium</option>
+      <option value="open_access">Open Access</option>
+    </select>
+  </div>
+  <div class="filter-group">
+    <label>Type</label>
+    <select id="filter-type">
+      <option value="all">All Types</option>
+      {Object.entries(resourceTypeLabels).map(([k, v]) => <option value={k}>{v}</option>)}
+    </select>
+  </div>
+  <div class="filter-group">
+    <label>Verified</label>
+    <select id="filter-verified">
+      <option value="all">All Status</option>
+      <option value="verified">Verified</option>
+    </select>
+  </div>
+  <div class="filter-group sort-group">
+    <label>Sort</label>
+    <select id="sort-select">
+      <option value="relevance">Relevance</option>
+      <option value="rating">Rating</option>
+      <option value="alphabetical">Alphabetical</option>
+    </select>
+  </div>
+  <span class="result-count" id="result-count">{initialCount} resources</span>
+</div>
+
+<script is:inline>
+  const filterAccess = document.getElementById('filter-access');
+  const filterType = document.getElementById('filter-type');
+  const filterVerified = document.getElementById('filter-verified');
+  const sortSelect = document.getElementById('sort-select');
+  const resultCount = document.getElementById('result-count');
+  const searchInput = document.getElementById('{searchId}');
+  const rows = document.querySelectorAll('.resource-row');
+
+  let debounceTimer: number;
+
+  function applyFilters() {
+    const access = filterAccess.value;
+    const type = filterType.value;
+    const verified = filterVerified.value;
+    const sort = sortSelect.value;
+    const q = searchInput?.value.toLowerCase().trim() || '';
+    let count = 0;
+
+    rows.forEach(row => {
+      const matchSearch = q === '' ||
+        row.dataset.title?.includes(q) ||
+        row.dataset.desc?.includes(q) ||
+        row.dataset.domain?.includes(q) ||
+        row.dataset.tags?.includes(q) ||
+        row.dataset.sub?.includes(q);
+      const matchAccess = access === 'all' || row.dataset.access === access;
+      const matchType = type === 'all' || row.dataset.type === type;
+      const matchVerified = verified === 'all' || (verified === 'verified' && row.dataset.verified === 'true');
+      const show = matchSearch && matchAccess && matchType && matchVerified;
+      row.style.display = show ? '' : 'none';
+      if (show) count++;
+    });
+
+    resultCount.textContent = `${count} resources`;
+
+    // Hide empty sections
+    document.querySelectorAll('.resource-section').forEach(sec => {
+      const visible = sec.querySelectorAll('.resource-row:not([style*="none"])').length;
+      sec.style.display = visible > 0 ? '' : 'none';
+    });
+
+    // Sort
+    if (sort === 'rating' || sort === 'relevance') {
+      document.querySelectorAll('.resource-section').forEach(sec => {
+        const subRows = Array.from(sec.querySelectorAll('.resource-row'));
+        subRows.sort((a, b) => parseFloat(b.dataset.rating) - parseFloat(a.dataset.rating));
+        subRows.forEach(r => sec.appendChild(r));
+      });
+    } else if (sort === 'alphabetical') {
+      document.querySelectorAll('.resource-section').forEach(sec => {
+        const subRows = Array.from(sec.querySelectorAll('.resource-row'));
+        subRows.sort((a, b) => a.dataset.title.localeCompare(b.dataset.title));
+        subRows.forEach(r => sec.appendChild(r));
+      });
+    }
+  }
+
+  function debouncedApply() {
+    clearTimeout(debounceTimer);
+    debounceTimer = window.setTimeout(applyFilters, 150);
+  }
+
+  [filterAccess, filterType, filterVerified, sortSelect].forEach(el => el.addEventListener('change', applyFilters));
+  searchInput?.addEventListener('input', debouncedApply);
+</script>

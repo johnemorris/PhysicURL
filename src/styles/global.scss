@@ -171,7 +171,6 @@ ul, ol { list-style: none; }
           font-weight: 600;
           color: var(--color-text);
           transition: background .1s;
-          text-decoration: none;
 
           &:hover { background: var(--color-surface-2); }
 
@@ -184,12 +183,41 @@ ul, ol { list-style: none; }
             user-select: none;
           }
 
+          .tree-science-link {
+            flex: 1;
+            color: var(--color-text);
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 600;
+            &:hover { color: var(--color-primary); }
+          }
+
           .tree-science-count {
             margin-left: auto;
             color: var(--color-text-faint);
             font-size: 11px;
             font-family: var(--font-mono);
           }
+        }
+
+        .tree-science-toggle {
+          background: none;
+          border: none;
+          color: inherit;
+          cursor: pointer;
+          padding: 2px 4px;
+          font-size: 10px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          width: 20px;
+          height: 20px;
+          border-radius: 4px;
+          transition: background .1s;
+          flex-shrink: 0;
+
+          &:hover { background: var(--color-surface-2); }
+          &:focus { outline: 2px solid var(--color-primary); outline-offset: 1px; }
         }
 
         .tree-sub {

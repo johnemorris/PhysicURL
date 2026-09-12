@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react';
 import { QUESTIONS, CATALOG, computeKit, kitTotal } from '../lib/astroWizard.js';
+import { addReferralParams } from '../lib/referral.ts';
 import AstroObservationDeck from './AstroObservationDeck.jsx';
 
 export default function AstroWizard() {
@@ -150,9 +151,9 @@ function labelFor(qid, aid) {
 
 function vendorLink(v) {
   switch (v) {
-    case 'High Point Scientific': return 'https://www.highpointscientific.com/telescopes';
-    case 'Agena Astro': return 'https://www.agenaastro.com/telescopes.html';
-    default: return 'https://www.amazon.com/s?k=telescope';
+    case 'High Point Scientific': return addReferralParams('https://www.highpointscientific.com/telescopes');
+    case 'Agena Astro': return addReferralParams('https://www.agenaastro.com/telescopes.html');
+    default: return addReferralParams('https://www.amazon.com/s?k=telescope');
   }
 }
 
@@ -172,7 +173,7 @@ function ChecklistSection({ title, ids, tone }) {
                 {it.spec && <div className="cs-spec">{it.spec}</div>}
               </div>
               <div className="cs-price">${it.price}</div>
-              <a className="cs-link" href={it.url} target="_blank" rel="nofollow noopener sponsored">{it.vendor} →</a>
+              <a className="cs-link" href={addReferralParams(it.url)} target="_blank" rel="nofollow noopener sponsored">{it.vendor} →</a>
             </div>
           );
         })}

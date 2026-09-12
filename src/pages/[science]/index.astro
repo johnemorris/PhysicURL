@@ -1,8 +1,10 @@
 ---
 import DirectoryLayout from '../../layouts/DirectoryLayout.astro';
-import { loadResources, loadSEOContent, loadStatusMap, buildTree, SCIENCES, RESOURCE_TYPE_LABELS, ACCESS_LABELS, slugify } from '../../lib/data';
+import { loadResources, loadSEOContent, loadStatusMap, buildTree, SCIENCES, RESOURCE_TYPE_LABELS, ACCESS_LABELS, slugify } from '../../lib/data-node';
 import { scienceContent } from '../../lib/scienceContent.js';
 import { scienceDiagrams } from '../../lib/scienceDiagrams.js';
+import FilterBar from '../../components/FilterBar.astro';
+import ResourceRow from '../../components/ResourceRow.astro';
 
 export function getStaticPaths() {
   const resources = loadResources();
@@ -102,7 +104,7 @@ const faqJsonLd = seo.faq.length > 0 ? {
         <div class="wizard-cta-icon">⚗</div>
         <div class="wizard-cta-body">
           <div class="wizard-cta-title">Build Your Own Chem Set</div>
-          <div class="wizard-cta-sub">Answer 4 quick questions and we’ll generate a customized equipment checklist for your age, space, focus, and budget.</div>
+          <div class="wizard-cta-sub">Answer 4 quick questions and we'll generate a customized equipment checklist for your age, space, focus, and budget.</div>
         </div>
         <div class="wizard-cta-arrow">→</div>
       </a>
@@ -114,7 +116,7 @@ const faqJsonLd = seo.faq.length > 0 ? {
         <div class="wizard-cta-icon">🔭</div>
         <div class="wizard-cta-body">
           <div class="wizard-cta-title">Build Your Perfect Telescope Kit</div>
-          <div class="wizard-cta-sub">Answer 4 quick questions — target, environment, experience, budget — and we’ll design your optical tube, mount, eyepieces, filters, and dark-sky accessories.</div>
+          <div class="wizard-cta-sub">Answer 4 quick questions — target, environment, experience, budget — and we'll design your optical tube, mount, eyepieces, filters, and dark-sky accessories.</div>
         </div>
         <div class="wizard-cta-arrow">→</div>
       </a>
@@ -130,40 +132,14 @@ const faqJsonLd = seo.faq.length > 0 ? {
   </div>
 
   {/* Filter Bar */}
-  <div class="filter-bar">
-    <div class="filter-group">
-      <label>Access</label>
-      <select id="filter-access">
-        <option value="all">All Access</option>
-        <option value="free">Free</option>
-        <option value="paid">Paid</option>
-        <option value="freemium">Freemium</option>
-      </select>
-    </div>
-    <div class="filter-group">
-      <label>Type</label>
-      <select id="filter-type">
-        <option value="all">All Types</option>
-        {Object.entries(RESOURCE_TYPE_LABELS).map(([k, v]) => <option value={k}>{v}</option>)}
-      </select>
-    </div>
-    <div class="filter-group">
-      <label>Verified</label>
-      <select id="filter-verified">
-        <option value="all">All Status</option>
-        <option value="verified">Verified</option>
-      </select>
-    </div>
-    <div class="filter-group sort-group">
-      <label>Sort</label>
-      <select id="sort-select">
-        <option value="relevance">Relevance</option>
-        <option value="rating">Rating</option>
-        <option value="alphabetical">Alphabetical</option>
-      </select>
-    </div>
-    <span class="result-count" id="result-count">{sciResources.length} resources</span>
-  </div>
+  <FilterBar
+    initialCount={sciResources.length}
+    resourceTypeLabels={RESOURCE_TYPE_LABELS}
+    accessLabels={ACCESS_LABELS}
+    showSearch={true}
+    searchPlaceholder={landing.searchPlaceholder || `Search ${science.name} resources...`}
+    searchId="scoped-search"
+  />
 
   {/* Resource List */}
   <div class="resource-list" id="resource-list">
@@ -176,23 +152,14 @@ const faqJsonLd = seo.faq.length > 0 ? {
             const status = statusMap[r.url];
             const isUnderReview = !!status;
             return (
-              <div class={`resource-row ${isUnderReview ? 'under-review' : ''}`} data-access={r.access} data-type={r.resourceType} data-verified={r.isVerified} data-rating={r.rating} data-title={r.title.toLowerCase()} data-desc={r.description.toLowerCase()} data-domain={r.domain.toLowerCase()} data-tags={r.tags.join(' ').toLowerCase()} data-sub={r.subdiscipline.toLowerCase()}>
-                <div class="resource-title-line">
-                  <a href={r.url} target="_blank" rel="noopener" class={`resource-title ${isUnderReview ? 'disabled-link' : ''}`}>{r.title}</a>
-                  {r.isVerified && <span class="verified-badge">✓ Verified</span>}
-                  {isUnderReview && <span class="review-badge" title={status?.details || 'Under review'}>⚠ Under Review</span>}
-                  {r.isAffiliate && <span class="affiliate-badge">Affiliate</span>}
-                  <span class="resource-domain">{r.domain}</span>
-                </div>
-                <div class="resource-description">{r.description}</div>
-                <div class="resource-tags">
-                  {r.tags.map(tag => <span class="resource-tag">#{tag}</span>)}
-                </div>
-                <div class="resource-meta">
-                  <span class={`access-badge-${r.access}`}>{ACCESS_LABELS[r.access] || r.access}</span>
-                  <span class="rating">★ {r.rating}</span>
-                </div>
-              </div>
+              <ResourceRow
+                resource={{
+                  ...r,
+                  isUnderReview,
+                  reviewDetails: status?.details || 'Under review',
+                }}
+                accessLabels={ACCESS_LABELS}
+              />
             );
           })}
         </div>
@@ -213,66 +180,3 @@ const faqJsonLd = seo.faq.length > 0 ? {
     </section>
   )}
 </DirectoryLayout>
-
-<script is:inline>
-  // Scoped search — filters within this science only
-  const scopedSearch = document.getElementById('scoped-search');
-  const filterAccess = document.getElementById('filter-access');
-  const filterType = document.getElementById('filter-type');
-  const filterVerified = document.getElementById('filter-verified');
-  const sortSelect = document.getElementById('sort-select');
-  const resultCount = document.getElementById('result-count');
-  const rows = document.querySelectorAll('.resource-row');
-
-  function applyFilters() {
-    const q = scopedSearch.value.toLowerCase().trim();
-    const access = filterAccess.value;
-    const type = filterType.value;
-    const verified = filterVerified.value;
-    const sort = sortSelect.value;
-    let count = 0;
-
-    rows.forEach(row => {
-      const matchSearch = q === '' ||
-        row.dataset.title.includes(q) ||
-        row.dataset.desc.includes(q) ||
-        row.dataset.domain.includes(q) ||
-        row.dataset.tags.includes(q) ||
-        row.dataset.sub.includes(q);
-      const matchAccess = access === 'all' || row.dataset.access === access;
-      const matchType = type === 'all' || row.dataset.type === type;
-      const matchVerified = verified === 'all' || (verified === 'verified' && row.dataset.verified === 'true');
-      const show = matchSearch && matchAccess && matchType && matchVerified;
-      row.style.display = show ? '' : 'none';
-      if (show) count++;
-    });
-
-    resultCount.textContent = count + ' resources';
-
-    // Hide empty sections
-    document.querySelectorAll('.resource-section').forEach(sec => {
-      const visible = sec.querySelectorAll('.resource-row:not([style*="none"])').length;
-      sec.style.display = visible > 0 ? '' : 'none';
-    });
-
-    // Sort
-    if (sort === 'rating' || sort === 'relevance') {
-      document.querySelectorAll('.resource-section').forEach(sec => {
-        const subRows = Array.from(sec.querySelectorAll('.resource-row'));
-        subRows.sort((a, b) => parseFloat(b.dataset.rating) - parseFloat(a.dataset.rating));
-        subRows.forEach(r => sec.appendChild(r));
-      });
-    } else if (sort === 'alphabetical') {
-      document.querySelectorAll('.resource-section').forEach(sec => {
-        const subRows = Array.from(sec.querySelectorAll('.resource-row'));
-        subRows.sort((a, b) => a.dataset.title.localeCompare(b.dataset.title));
-        subRows.forEach(r => sec.appendChild(r));
-      });
-    }
-  }
-
-  [scopedSearch, filterAccess, filterType, filterVerified, sortSelect].forEach(el => {
-    el.addEventListener('input', applyFilters);
-    el.addEventListener('change', applyFilters);
-  });
-</script>
