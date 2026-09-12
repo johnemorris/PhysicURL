@@ -104,7 +104,7 @@ export default function ResourceExplorer({ resources = [], scienceScope = null, 
                     <a
                       href={underReview ? '#' : r.url}
                       target="_blank"
-                      rel={r.isAffiliate ? 'noopener sponsored' : 'noopener'}
+                      rel={r.isAffiliate ? 'noopener nofollow sponsored' : 'noopener'}
                       className={`resource-title ${underReview ? 'disabled-link' : ''}`}
                     >
                       {r.title}

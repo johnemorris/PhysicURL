@@ -519,31 +519,28 @@ ul, ol { list-style: none; }
 
         .disabled-link { pointer-events: none; color: var(--color-text-faint); }
 
-        .verified-badge {
+        .verified-badge,
+        .review-badge,
+        .affiliate-badge {
           font-size: 10px;
           font-weight: 600;
           padding: 2px 7px;
           border-radius: 99px;
+        }
+
+        .verified-badge {
           background: rgba(16, 185, 129, .12);
           color: var(--color-emerald);
           border: 1px solid rgba(16, 185, 129, .3);
         }
 
         .review-badge {
-          font-size: 10px;
-          font-weight: 600;
-          padding: 2px 7px;
-          border-radius: 99px;
           background: rgba(245, 158, 11, .12);
           color: var(--color-amber);
           border: 1px solid rgba(245, 158, 11, .3);
         }
 
         .affiliate-badge {
-          font-size: 10px;
-          font-weight: 600;
-          padding: 2px 7px;
-          border-radius: 99px;
           background: rgba(168, 85, 247, .12);
           color: var(--color-purple);
           border: 1px solid rgba(168, 85, 247, .3);
@@ -877,20 +874,6 @@ ul, ol { list-style: none; }
 }
 
 // ===== Submit Modal =====
-.submit-btn {
-  background: var(--color-primary);
-  color: #001220;
-  border: none;
-  border-radius: 6px;
-  padding: 6px 14px;
-  font-size: 12px;
-  font-weight: 600;
-  cursor: pointer;
-  font-family: inherit;
-
-  &:hover { background: #7dd3fc; }
-}
-
 .modal-overlay {
   position: fixed;
   inset: 0;
@@ -989,92 +972,77 @@ ul, ol { list-style: none; }
 }
 
 // ===== Global Button System =====
-// Use `.btn` as the base class with a modifier for variant:
-//   <button class="btn btn-primary">…</button>
-// Standalone .btn-primary / .btn-secondary / .btn-danger still work for
-// React components where a compound class name is less convenient.
-
-.btn {
+// Supports both compound class markup (<button class="btn btn-primary">)
+// and standalone classes (<button class="btn-primary"> / <button class="submit-btn">)
+.btn,
+.btn-primary,
+.btn-secondary,
+.btn-danger,
+.submit-btn {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 8px 16px;
-  border-radius: 8px;
+  border-radius: 6px;
   font-size: 13px;
   font-weight: 600;
   cursor: pointer;
   border: none;
   text-decoration: none;
   font-family: inherit;
-
-  &.btn-primary {
-    background: var(--color-primary);
-    color: #001220;
-    &:hover:not(:disabled) { background: #7dd3fc; }
-    &:disabled { opacity: 0.5; cursor: not-allowed; }
-  }
-
-  &.btn-secondary {
-    background: var(--color-surface-2);
-    color: var(--color-text);
-    border: 1px solid var(--color-border);
-    &:hover:not(:disabled) { background: var(--color-surface-3); }
-  }
-
-  &.btn-copy {
-    background: var(--color-surface-2);
-    color: var(--color-text-muted);
-    border: 1px solid var(--color-border);
-    &:hover { background: var(--color-surface-3); }
-  }
-
-  &.btn-lg {
-    font-size: 14px;
-    padding: 12px 24px;
-  }
+  padding: 8px 14px;
 }
 
-.btn-primary {
+.btn-primary,
+.btn.btn-primary,
+.submit-btn {
   background: var(--color-primary);
   color: #001220;
   border: none;
-  border-radius: 6px;
-  padding: 8px 14px;
-  font-size: 13px;
-  font-weight: 600;
-  cursor: pointer;
-  font-family: inherit;
 
   &:hover:not(:disabled) { background: #7dd3fc; }
   &:disabled { opacity: 0.5; cursor: not-allowed; }
 }
 
-.btn-secondary {
+.btn-secondary,
+.btn.btn-secondary {
   background: var(--color-surface-2);
   color: var(--color-text);
   border: 1px solid var(--color-border);
-  border-radius: 6px;
-  padding: 8px 14px;
-  font-size: 13px;
-  font-weight: 600;
-  cursor: pointer;
-  font-family: inherit;
+
+  &:hover:not(:disabled) { background: var(--color-surface-3); }
+  &:disabled { opacity: 0.5; cursor: not-allowed; }
+}
+
+.btn-danger,
+.btn.btn-danger {
+  background: rgba(245,158,11,0.15);
+  color: var(--color-amber);
+  border: 1px solid rgba(245,158,11,0.4);
+
+  &:hover:not(:disabled) { background: rgba(245,158,11,0.25); }
+  &:disabled { opacity: 0.5; cursor: not-allowed; }
+}
+
+.btn-copy,
+.btn.btn-copy {
+  background: var(--color-surface-2);
+  color: var(--color-text-muted);
+  border: 1px solid var(--color-border);
 
   &:hover:not(:disabled) { background: var(--color-surface-3); }
 }
 
-.btn-danger {
-  background: rgba(245,158,11,0.15);
-  color: var(--color-amber);
-  border: 1px solid rgba(245,158,11,0.4);
-  border-radius: 6px;
-  padding: 8px 14px;
-  font-size: 13px;
-  font-weight: 600;
-  cursor: pointer;
-  font-family: inherit;
+.btn-sm,
+.btn.btn-sm,
+.submit-btn {
+  font-size: 12px;
+  padding: 6px 14px;
+}
 
-  &:hover { background: rgba(245,158,11,0.25); }
+.btn-lg,
+.btn.btn-lg {
+  font-size: 14px;
+  padding: 12px 24px;
 }
 
 // ===== Admin Dashboard =====
@@ -1340,7 +1308,7 @@ ul, ol { list-style: none; }
   }
 
   .wizard-cta-sub {
-    font-size: 12.5px;
+    font-size: 13px;
     color: var(--color-text-muted);
     line-height: 1.45;
   }

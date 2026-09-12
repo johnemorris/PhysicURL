@@ -1,17 +1,22 @@
 import { useState } from 'react';
-import { SCIENCES } from '../lib/data';
-
-const ACCESS = ['open', 'subscription', 'freemium', 'affiliate'];
-const TYPES = ['reference', 'journal', 'database', 'tool', 'youtube', 'simulator', 'software', 'university', 'supplies'];
+import { SCIENCES, ACCESS_LABELS, RESOURCE_TYPE_LABELS } from '../lib/data';
 
 const API = import.meta.env.PUBLIC_API_URL || 'http://localhost:5000';
 
+const INITIAL_FORM = {
+  name: '',
+  url: '',
+  description: '',
+  science: 'physics',
+  subdiscipline: '',
+  submitter_email: '',
+  access: 'open',
+  resource_type: 'reference',
+};
+
 export default function SubmitModal() {
   const [open, setOpen] = useState(false);
-  const [form, setForm] = useState({
-    name: '', url: '', description: '', science: 'Physics',
-    subdiscipline: '', submitter_email: '', access: 'open', resource_type: 'reference'
-  });
+  const [form, setForm] = useState(INITIAL_FORM);
   const [status, setStatus] = useState(null);
   const [msg, setMsg] = useState('');
 
@@ -23,13 +28,13 @@ export default function SubmitModal() {
       const r = await fetch(`${API}/api/submit`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(form)
+        body: JSON.stringify(form),
       });
       const j = await r.json();
       if (!r.ok) throw new Error(j.error || 'Submission failed');
       setStatus('ok');
       setMsg('Thanks — your submission is queued for review.');
-      setForm({ name: '', url: '', description: '', science: 'Physics', subdiscipline: '', submitter_email: '', access: 'open', resource_type: 'reference' });
+      setForm(INITIAL_FORM);
     } catch (err) {
       setStatus('err');
       setMsg(err.message);
@@ -61,12 +66,12 @@ export default function SubmitModal() {
               <div className="modal-row">
                 <label>Access
                   <select value={form.access} onChange={e => setForm({ ...form, access: e.target.value })}>
-                    {ACCESS.map(a => <option key={a} value={a}>{a}</option>)}
+                    {Object.entries(ACCESS_LABELS).map(([key, label]) => <option key={key} value={key}>{label}</option>)}
                   </select>
                 </label>
                 <label>Type
                   <select value={form.resource_type} onChange={e => setForm({ ...form, resource_type: e.target.value })}>
-                    {TYPES.map(t => <option key={t} value={t}>{t}</option>)}
+                    {Object.entries(RESOURCE_TYPE_LABELS).map(([key, label]) => <option key={key} value={key}>{label}</option>)}
                   </select>
                 </label>
               </div>

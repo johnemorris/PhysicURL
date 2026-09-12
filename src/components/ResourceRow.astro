@@ -25,7 +25,7 @@ const { title, url, domain, description, tags, access, resourceType, isVerified,
 
 // Add referral parameters for affiliate/merchant URLs
 const finalUrl = isAffiliate || isAffiliateUrl(url) ? addReferralParams(url) : url;
-const relAttr = isAffiliate || isAffiliateUrl(finalUrl) ? 'noopener sponsored' : 'noopener';
+const relAttr = isAffiliate || isAffiliateUrl(finalUrl) ? 'noopener nofollow sponsored' : 'noopener';
 ---
 
 <div class={`resource-row ${isUnderReview ? 'under-review' : ''}`}

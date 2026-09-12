@@ -15,6 +15,16 @@ const FEATURES = [
   { dot: 'purple', label: 'Budget-tuned affiliate links' },
 ];
 
+const MATERIAL_LABELS = {
+  plastic: 'Shatterproof plastic',
+  borosilicate: 'Borosilicate glass',
+  jointed: 'Jointed 24/40 glassware',
+};
+
+function materialLabel(material) {
+  return MATERIAL_LABELS[material] || 'Standard equipment';
+}
+
 export default function ChemWizard() {
   const [started, setStarted] = useState(false);
   const [step, setStep] = useState(0);
@@ -66,7 +76,7 @@ export default function ChemWizard() {
           <WizardSummary
             title="Your Lab Is Configured"
             metaParts={[
-              kit.material === 'plastic' ? 'Shatterproof plastic' : kit.material === 'borosilicate' ? 'Borosilicate glass' : 'Jointed 24/40 glassware',
+              materialLabel(kit.material),
               kit.focusLabel,
               `via ${kit.vendor}`,
             ]}
@@ -97,7 +107,7 @@ export default function ChemWizard() {
                 <div className="bundle-sub">Buy the pre-assembled bundle from {CATALOG[kit.bundle].vendor} instead of shopping individually.</div>
               </div>
               <div className="bundle-price">${CATALOG[kit.bundle].price}</div>
-              <a href={addReferralParams(CATALOG[kit.bundle].url)} target="_blank" rel="noopener sponsored" className="btn-primary">
+              <a href={addReferralParams(CATALOG[kit.bundle].url)} target="_blank" rel="noopener nofollow sponsored" className="btn-primary">
                 Buy Kit &rarr;
               </a>
             </div>

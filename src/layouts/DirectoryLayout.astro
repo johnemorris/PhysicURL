@@ -183,8 +183,8 @@ const jsonLd = {
         toggle.setAttribute('aria-expanded', String(isOpen));
       }
     });
-    const currentPath = window.location.pathname.replace(/\.html$/, '').replace(//$/, '');
-    const sciMatch = currentPath.match(/^\/([^\/]+)/);
+    const currentPath = window.location.pathname.replace(/\.html$/, '').replace(/\/$/, '');
+    const sciMatch = currentPath.match(/^\/([^/]+)/);
     if (sciMatch) {
       const el = document.querySelector(`[data-science="${sciMatch[1]}"]`);
       if (el) {
