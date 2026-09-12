@@ -1,8 +1,10 @@
 import { useState } from 'react';
+import { SCIENCES } from '../lib/data';
 
-const SCIENCES = ['Physics', 'Chemistry', 'Astronomy', 'Earth Sciences', 'Biophysics', 'Materials Science', 'Mathematical Physics'];
 const ACCESS = ['open', 'subscription', 'freemium', 'affiliate'];
 const TYPES = ['reference', 'journal', 'database', 'tool', 'youtube', 'simulator', 'software', 'university', 'supplies'];
+
+const API = import.meta.env.PUBLIC_API_URL || 'http://localhost:5000';
 
 export default function SubmitModal() {
   const [open, setOpen] = useState(false);
@@ -10,7 +12,7 @@ export default function SubmitModal() {
     name: '', url: '', description: '', science: 'Physics',
     subdiscipline: '', submitter_email: '', access: 'open', resource_type: 'reference'
   });
-  const [status, setStatus] = useState(null); // null | 'sending' | 'ok' | 'err'
+  const [status, setStatus] = useState(null);
   const [msg, setMsg] = useState('');
 
   const submit = async (e) => {
@@ -18,7 +20,7 @@ export default function SubmitModal() {
     setStatus('sending');
     setMsg('');
     try {
-      const r = await fetch('__PORT_5000__/api/submit', {
+      const r = await fetch(`${API}/api/submit`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(form)
@@ -51,7 +53,7 @@ export default function SubmitModal() {
               <div className="modal-row">
                 <label>Science
                   <select value={form.science} onChange={e => setForm({ ...form, science: e.target.value })}>
-                    {SCIENCES.map(s => <option key={s} value={s}>{s}</option>)}
+                    {SCIENCES.map(s => <option key={s.slug} value={s.slug}>{s.name}</option>)}
                   </select>
                 </label>
                 <label>Subdiscipline <input value={form.subdiscipline} onChange={e => setForm({ ...form, subdiscipline: e.target.value })} placeholder="e.g. Quantum Mechanics" /></label>

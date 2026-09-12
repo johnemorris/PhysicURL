@@ -80,11 +80,18 @@ const jsonLd = {
       <nav class="tree-nav" id="tree-nav">
         {tree.map(sci => (
           <div class="tree-science" data-science={sci.slug}>
-            <a href={`/${sci.slug}.html`} class="tree-science-header" onclick={`toggleScience('${sci.slug}')`}>
-              <span class="chevron">▶</span>
-              <span class="tree-science-name" style="flex:1">{sci.name}</span>
+            <div class="tree-science-header">
+              <button
+                type="button"
+                class="tree-science-toggle"
+                data-science-toggle={sci.slug}
+                aria-expanded="false"
+              >
+                <span class="chevron">▶</span>
+              </button>
+              <a href={`/${sci.slug}.html`} class="tree-science-link" style="flex:1">{sci.name}</a>
               <span class="tree-science-count">{sci.count}</span>
-            </a>
+            </div>
             <div class="tree-sub">
               {sci.subdisciplines.map(sub => (
                 <a href={`/${sci.slug}/${sub.slug}.html`} class={currentPath === `/${sci.slug}/${sub.slug}` ? 'active' : ''}>
@@ -150,15 +157,17 @@ const jsonLd = {
       if (el) el.classList.add('open');
       window.location.href = '/' + slug + '.html';
     }
-    function toggleScience(slug) {
-      const el = document.querySelector(`[data-science="${slug}"]`);
-      if (el) el.classList.toggle('open');
-    }
     document.getElementById('expand-all').addEventListener('click', () => {
-      document.querySelectorAll('.tree-science').forEach(el => el.classList.add('open'));
+      document.querySelectorAll('.tree-science').forEach(el => {
+        el.classList.add('open');
+        el.querySelector('.tree-science-toggle')?.setAttribute('aria-expanded', 'true');
+      });
     });
     document.getElementById('collapse-all').addEventListener('click', () => {
-      document.querySelectorAll('.tree-science').forEach(el => el.classList.remove('open'));
+      document.querySelectorAll('.tree-science').forEach(el => {
+        el.classList.remove('open');
+        el.querySelector('.tree-science-toggle')?.setAttribute('aria-expanded', 'false');
+      });
     });
     document.getElementById('sidebar-search').addEventListener('input', (e) => {
       const q = e.target.value.toLowerCase();
@@ -167,12 +176,26 @@ const jsonLd = {
         el.style.display = q === '' || text.includes(q) ? '' : 'none';
       });
     });
-    // Open current science in tree
+    document.getElementById('tree-nav').addEventListener('click', (e) => {
+      const toggle = e.target.closest('[data-science-toggle]');
+      if (toggle) {
+        e.preventDefault();
+        e.stopPropagation();
+        const slug = toggle.dataset.scienceToggle;
+        const el = document.querySelector(`[data-science="${slug}"]`);
+        if (!el) return;
+        const isOpen = el.classList.toggle('open');
+        toggle.setAttribute('aria-expanded', String(isOpen));
+      }
+    });
     const currentPath = window.location.pathname.replace(/\.html$/, '').replace(/\/$/, '');
     const sciMatch = currentPath.match(/^\/([^\/]+)/);
     if (sciMatch) {
       const el = document.querySelector(`[data-science="${sciMatch[1]}"]`);
-      if (el) el.classList.add('open');
+      if (el) {
+        el.classList.add('open');
+        el.querySelector('.tree-science-toggle')?.setAttribute('aria-expanded', 'true');
+      }
     }
   </script>
 </body>

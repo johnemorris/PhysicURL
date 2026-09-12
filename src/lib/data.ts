@@ -1,8 +1,4 @@
-import type { Resource, ScienceConfig, SEOContent, TreeScience } from './types';
-import { readFileSync } from 'fs';
-import { join } from 'path';
-
-const DATA_DIR = join(process.cwd(), 'data');
+import type { Resource, ScienceConfig, SEOContent, TreeScience, Submission } from './types';
 
 export const SCIENCES: ScienceConfig[] = [
   { slug: 'physics', name: 'Physics', description: 'The fundamental science of matter, energy, space, and time. Browse databases, simulators, university programs, and research portals.', icon: 'atom' },
@@ -14,27 +10,43 @@ export const SCIENCES: ScienceConfig[] = [
   { slug: 'mathematical-physics', name: 'Mathematical Physics', description: 'Mathematical methods for physics. Browse computational tools, reference databases, and educational resources.', icon: 'sigma' },
 ];
 
+export function normalizeResource(r: any): Resource {
+  return {
+    id: r.id,
+    title: r.name || r.title,
+    url: r.url,
+    domain: r.domain || new URL(r.url).hostname,
+    description: r.description || '',
+    science: r.science,
+    subdiscipline: r.subdiscipline || 'General',
+    resourceType: r.resourceType || r.resource_type || 'reference',
+    access: r.access || 'free',
+    rating: r.rating ?? null,
+    yearEstablished: r.yearEstablished || r.added?.slice(0, 4) || '',
+    tags: r.tags || [],
+    isVerified: r.isVerified ?? r.verified ?? false,
+    isCurated: r.isCurated ?? true,
+    featured: r.featured ?? false,
+    isAffiliate: r.isAffiliate ?? false,
+    addedDate: r.addedDate || r.added,
+  };
+}
+
+// Client-safe stubs - these only work in Astro build context
 export function loadResources(): Resource[] {
-  const raw = readFileSync(join(DATA_DIR, 'resources.json'), 'utf-8');
-  return JSON.parse(raw);
+  throw new Error('loadResources() can only be used in Astro build context (server-side)');
+}
+
+export function loadSubmissions(): Submission[] {
+  throw new Error('loadSubmissions() can only be used in Astro build context (server-side)');
 }
 
 export function loadSEOContent(): Record<string, SEOContent> {
-  try {
-    const raw = readFileSync(join(DATA_DIR, 'seo_content.json'), 'utf-8');
-    return JSON.parse(raw);
-  } catch {
-    return {};
-  }
+  throw new Error('loadSEOContent() can only be used in Astro build context (server-side)');
 }
 
 export function loadStatusMap(): Record<string, { status: string; details: string }> {
-  try {
-    const raw = readFileSync(join(DATA_DIR, 'resource_status.json'), 'utf-8');
-    return JSON.parse(raw);
-  } catch {
-    return {};
-  }
+  throw new Error('loadStatusMap() can only be used in Astro build context (server-side)');
 }
 
 export function slugify(name: string): string {
@@ -79,8 +91,9 @@ export const RESOURCE_TYPE_LABELS: Record<string, string> = {
   reference: 'Reference', educational: 'Educational', tutorial: 'Tutorial',
   organization: 'Organization', book: 'Book', kit: 'Kit', equipment: 'Equipment',
   course: 'Course', video: 'Video', supply: 'Supply',
+  portal_lab: 'Portal / Lab',
 };
 
 export const ACCESS_LABELS: Record<string, string> = {
-  free: 'Free', paid: 'Paid', freemium: 'Freemium', open_access: 'Open Access',
+  free: 'Free', paid: 'Paid', freemium: 'Freemium', open_access: 'Open Access', open: 'Open', subscription: 'Subscription',
 };

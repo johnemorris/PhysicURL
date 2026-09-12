@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react';
 import { QUESTIONS, CATALOG, computeKit, kitTotal } from '../lib/chemWizard.js';
+import { addReferralParams } from '../lib/referral.ts';
 import ChemLabPreview from './ChemLabPreview.jsx';
 
 export default function ChemWizard() {
@@ -138,7 +139,7 @@ export default function ChemWizard() {
                 <div className="bundle-sub">Buy the pre-assembled bundle from {CATALOG[kit.bundle].vendor} instead of shopping individually.</div>
               </div>
               <div className="bundle-price">${CATALOG[kit.bundle].price}</div>
-              <a href={CATALOG[kit.bundle].url} target="_blank" rel="noopener sponsored" className="btn-primary">
+              <a href={addReferralParams(CATALOG[kit.bundle].url)} target="_blank" rel="noopener sponsored" className="btn-primary">
                 Buy Kit &rarr;
               </a>
             </div>
@@ -162,13 +163,14 @@ function ChecklistSection({ title, icon, items, vendor }) {
         {items.map(id => {
           const item = CATALOG[id];
           if (!item) return null;
+          const finalUrl = addReferralParams(item.url);
           return (
             <div key={id} className="cs-row">
               <div className="cs-name">
                 <span className="cs-label">{item.name}</span>
               </div>
               <div className="cs-price">${item.price}</div>
-              <a href={item.url} target="_blank" rel="noopener sponsored" className="cs-link">
+              <a href={finalUrl} target="_blank" rel="noopener sponsored" className="cs-link">
                 View on {vendor} &#8599;
               </a>
             </div>

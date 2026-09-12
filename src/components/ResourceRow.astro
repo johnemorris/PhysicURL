@@ -1,0 +1,56 @@
+---
+interface Props {
+  resource: {
+    title: string;
+    url: string;
+    domain: string;
+    description: string;
+    tags: string[];
+    access: string;
+    resourceType: string;
+    isVerified: boolean;
+    isAffiliate?: boolean;
+    rating: number;
+    subdiscipline: string;
+    isUnderReview?: boolean;
+    reviewDetails?: string;
+  };
+  accessLabels?: Record<string, string>;
+}
+
+import { addReferralParams, isAffiliateUrl } from '../lib/referral.ts';
+
+const { resource, accessLabels = {} } = Astro.props;
+const { title, url, domain, description, tags, access, resourceType, isVerified, isAffiliate, rating, subdiscipline, isUnderReview, reviewDetails } = resource;
+
+// Add referral parameters for affiliate/merchant URLs
+const finalUrl = isAffiliate || isAffiliateUrl(url) ? addReferralParams(url) : url;
+const relAttr = isAffiliate || isAffiliateUrl(finalUrl) ? 'noopener sponsored' : 'noopener';
+---
+
+<div class={`resource-row ${isUnderReview ? 'under-review' : ''}`}
+     data-access={access}
+     data-type={resourceType}
+     data-verified={isVerified}
+     data-rating={rating}
+     data-title={title.toLowerCase()}
+     data-desc={description.toLowerCase()}
+     data-domain={domain.toLowerCase()}
+     data-tags={tags.join(' ').toLowerCase()}
+     data-sub={subdiscipline.toLowerCase()}>
+  <div class="resource-title-line">
+    <a href={finalUrl} target="_blank" rel={relAttr} class={`resource-title ${isUnderReview ? 'disabled-link' : ''}`}>{title}</a>
+    {isVerified && <span class="verified-badge">✓ Verified</span>}
+    {isUnderReview && <span class="review-badge" title={reviewDetails || 'Under review'}>⚠ Under Review</span>}
+    {isAffiliate && <span class="affiliate-badge">Affiliate</span>}
+    <span class="resource-domain">{domain}</span>
+  </div>
+  <div class="resource-description">{description}</div>
+  <div class="resource-tags">
+    {tags.map(tag => <span class="resource-tag">#{tag}</span>)}
+  </div>
+  <div class="resource-meta">
+    <span class={`access-badge-${access}`}>{accessLabels[access] || access}</span>
+    <span class="rating">★ {rating}</span>
+  </div>
+</div>

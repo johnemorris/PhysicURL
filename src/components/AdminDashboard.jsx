@@ -1,16 +1,9 @@
 import { useState, useEffect } from 'react';
 
-const API = '__PORT_5000__';
-
-// In-memory auth (preview iframe blocks browser storage APIs).
-const AUTH = {
-  get() { return (typeof window !== 'undefined' && window.__PHY_TOK) || null; },
-  set(v) { if (typeof window !== 'undefined') window.__PHY_TOK = v; },
-  clear() { if (typeof window !== 'undefined') delete window.__PHY_TOK; },
-};
+const API = import.meta.env.PUBLIC_API_URL || 'http://localhost:5000';
 
 export default function AdminDashboard() {
-  const [token, setToken] = useState(typeof window !== 'undefined' ? AUTH.get() : null);
+  const [token, setToken] = useState(null);
   const [password, setPassword] = useState('');
   const [loginErr, setLoginErr] = useState('');
   const [tab, setTab] = useState('submissions');
@@ -23,17 +16,33 @@ export default function AdminDashboard() {
   const [bulkMsg, setBulkMsg] = useState('');
   const [editingIdx, setEditingIdx] = useState(-1);
   const [editForm, setEditForm] = useState(null);
+  const [csrfToken, setCsrfToken] = useState('');
+
+  const fetchCsrfToken = async () => {
+    try {
+      const r = await fetch(`${API}/api/csrf-token`, { credentials: 'include' });
+      const j = await r.json();
+      setCsrfToken(j.csrf_token);
+    } catch {}
+  };
 
   const authFetch = async (path, opts = {}) => {
-    const headers = { ...(opts.headers || {}), 'x-admin-token': token };
+    const headers = { ...(opts.headers || {}) };
     if (opts.body && typeof opts.body !== 'string') {
       headers['Content-Type'] = 'application/json';
       opts.body = JSON.stringify(opts.body);
     }
-    const r = await fetch(API + path, { ...opts, headers });
+    if (csrfToken) {
+      headers['x-csrf-token'] = csrfToken;
+    }
+    const r = await fetch(`${API}${path}`, { ...opts, headers, credentials: 'include' });
     if (r.status === 401) {
       logout();
       throw new Error('session expired');
+    }
+    if (r.status === 403) {
+      await fetchCsrfToken();
+      throw new Error('CSRF token expired, retrying...');
     }
     return r.json();
   };
@@ -42,28 +51,32 @@ export default function AdminDashboard() {
     e.preventDefault();
     setLoginErr('');
     try {
-      const r = await fetch(API + '/api/admin/login', {
+      const r = await fetch(`${API}/api/admin/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ password })
+        body: JSON.stringify({ password }),
+        credentials: 'include',
       });
       const j = await r.json();
       if (!r.ok) throw new Error(j.error || 'login failed');
-      AUTH.set(j.token);
       setToken(j.token);
+      await fetchCsrfToken();
     } catch (err) {
       setLoginErr(err.message);
     }
   };
 
-  const logout = () => {
-    AUTH.clear();
+  const logout = async () => {
+    try {
+      await fetch(`${API}/api/admin/logout`, { method: 'POST', credentials: 'include' });
+    } catch {}
     setToken(null);
+    setCsrfToken('');
   };
 
   const loadStats = async () => {
     try {
-      const r = await fetch(API + '/api/stats');
+      const r = await fetch(`${API}/api/stats`);
       setStats(await r.json());
     } catch {}
   };
@@ -83,8 +96,20 @@ export default function AdminDashboard() {
   };
 
   useEffect(() => {
-    if (!token) return;
     loadStats();
+    // Check if we have a valid session via cookie
+    fetch(`${API}/api/admin/submissions`, { credentials: 'include' })
+      .then(r => {
+        if (r.ok) {
+          setToken('cookie');
+          fetchCsrfToken();
+        }
+      })
+      .catch(() => {});
+  }, []);
+
+  useEffect(() => {
+    if (!token) return;
     if (tab === 'submissions') loadSubmissions();
     if (tab === 'resources') loadResources();
   }, [token, tab]);

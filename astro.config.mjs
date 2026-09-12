@@ -13,5 +13,8 @@ export default defineConfig({
     resolve: {
       alias: { '@': '/src' },
     },
+    define: {
+      'import.meta.env.PUBLIC_API_URL': JSON.stringify(process.env.PUBLIC_API_URL || 'http://localhost:5000'),
+    },
   },
 });

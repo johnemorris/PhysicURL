@@ -1,6 +1,8 @@
 ---
 import DirectoryLayout from '../layouts/DirectoryLayout.astro';
-import { loadResources, loadStatusMap, buildTree, SCIENCES, RESOURCE_TYPE_LABELS, ACCESS_LABELS } from '../lib/data';
+import { loadResources, loadStatusMap, buildTree, SCIENCES, RESOURCE_TYPE_LABELS, ACCESS_LABELS } from '../lib/data-node';
+import FilterBar from '../components/FilterBar.astro';
+import ResourceRow from '../components/ResourceRow.astro';
 
 const resources = loadResources();
 const statusMap = loadStatusMap();
@@ -26,40 +28,12 @@ const freeCount = resources.filter(r => r.access === 'free' || r.access === 'ope
   currentPath="/"
   totalCount={totalCount}
 >
-  <div class="filter-bar">
-    <div class="filter-group">
-      <label>Access</label>
-      <select id="filter-access">
-        <option value="all">All Access</option>
-        <option value="free">Free</option>
-        <option value="paid">Paid</option>
-        <option value="freemium">Freemium</option>
-      </select>
-    </div>
-    <div class="filter-group">
-      <label>Type</label>
-      <select id="filter-type">
-        <option value="all">All Types</option>
-        {Object.entries(RESOURCE_TYPE_LABELS).map(([k, v]) => <option value={k}>{v}</option>)}
-      </select>
-    </div>
-    <div class="filter-group">
-      <label>Verified</label>
-      <select id="filter-verified">
-        <option value="all">All Status</option>
-        <option value="verified">Verified</option>
-      </select>
-    </div>
-    <div class="filter-group sort-group">
-      <label>Sort</label>
-      <select id="sort-select">
-        <option value="relevance">Relevance</option>
-        <option value="rating">Rating</option>
-        <option value="alphabetical">Alphabetical</option>
-      </select>
-    </div>
-    <span class="result-count" id="result-count">{totalCount} resources</span>
-  </div>
+  <FilterBar 
+    initialCount={totalCount}
+    resourceTypeLabels={RESOURCE_TYPE_LABELS}
+    accessLabels={ACCESS_LABELS}
+    showSearch={false}
+  />
 
   <div class="resource-list" id="resource-list">
     {SCIENCES.map(sci => {
@@ -85,23 +59,14 @@ const freeCount = resources.filter(r => r.access === 'free' || r.access === 'ope
                   const status = statusMap[r.url];
                   const isUnderReview = !!status;
                   return (
-                    <div class={`resource-row ${isUnderReview ? 'under-review' : ''}`} data-access={r.access} data-type={r.resourceType} data-verified={r.isVerified} data-rating={r.rating}>
-                      <div class="resource-title-line">
-                        <a href={r.url} target="_blank" rel="noopener" class={`resource-title ${isUnderReview ? 'disabled-link' : ''}`}>{r.title}</a>
-                        {r.isVerified && <span class="verified-badge">✓ Verified</span>}
-                        {isUnderReview && <span class="review-badge" title={status?.details || 'Under review'}>⚠ Under Review</span>}
-                        {r.isAffiliate && <span class="affiliate-badge">Affiliate</span>}
-                        <span class="resource-domain">{r.domain}</span>
-                      </div>
-                      <div class="resource-description">{r.description}</div>
-                      <div class="resource-tags">
-                        {r.tags.map(tag => <span class="resource-tag">#{tag}</span>)}
-                      </div>
-                      <div class="resource-meta">
-                        <span class={`access-badge-${r.access}`}>{ACCESS_LABELS[r.access] || r.access}</span>
-                        <span class="rating">★ {r.rating}</span>
-                      </div>
-                    </div>
+                    <ResourceRow
+                      resource={{
+                        ...r,
+                        isUnderReview,
+                        reviewDetails: status?.details || 'Under review',
+                      }}
+                      accessLabels={ACCESS_LABELS}
+                    />
                   );
                 })}
               </div>
@@ -112,45 +77,3 @@ const freeCount = resources.filter(r => r.access === 'free' || r.access === 'ope
     })}
   </div>
 </DirectoryLayout>
-
-<script is:inline>
-  // Filter and sort logic
-  const filterAccess = document.getElementById('filter-access');
-  const filterType = document.getElementById('filter-type');
-  const filterVerified = document.getElementById('filter-verified');
-  const sortSelect = document.getElementById('sort-select');
-  const resultCount = document.getElementById('result-count');
-  const rows = document.querySelectorAll('.resource-row');
-
-  function applyFilters() {
-    const access = filterAccess.value;
-    const type = filterType.value;
-    const verified = filterVerified.value;
-    const sort = sortSelect.value;
-    let visible = 0;
-
-    rows.forEach(row => {
-      const matchAccess = access === 'all' || row.dataset.access === access;
-      const matchType = type === 'all' || row.dataset.type === type;
-      const matchVerified = verified === 'all' || (verified === 'verified' && row.dataset.verified === 'true');
-      const visible = matchAccess && matchType && matchVerified;
-      row.style.display = visible ? '' : 'none';
-      if (visible) visible++;
-    });
-
-    resultCount.textContent = `${visible} resources`;
-
-    // Sort within each subsection
-    document.querySelectorAll('.resource-subsection').forEach(sub => {
-      const rows = Array.from(sub.querySelectorAll('.resource-row'));
-      rows.sort((a, b) => {
-        if (sort === 'rating') return parseFloat(b.dataset.rating) - parseFloat(a.dataset.rating);
-        if (sort === 'alphabetical') return a.querySelector('.resource-title').textContent.localeCompare(b.querySelector('.resource-title').textContent);
-        return parseFloat(b.dataset.rating) - parseFloat(a.dataset.rating); // relevance = rating
-      });
-      rows.forEach(row => sub.appendChild(row));
-    });
-  }
-
-  [filterAccess, filterType, filterVerified, sortSelect].forEach(el => el.addEventListener('change', applyFilters));
-</script>
