@@ -34,6 +34,16 @@ const freeCount = resources.filter(r => r.access === 'free' || r.access === 'ope
     accessLabels={ACCESS_LABELS}
     showSearch={false}
   />
+  <div class="scope-meta" style="padding: 8px 24px; border-bottom: 1px solid var(--color-border-light);">
+    <span>
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+      {verifiedCount} verified
+    </span>
+    <span>
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
+      {freeCount} free / open access
+    </span>
+  </div>
 
   <div class="resource-list" id="resource-list">
     {SCIENCES.map(sci => {
@@ -53,8 +63,8 @@ const freeCount = resources.filter(r => r.access === 'free' || r.access === 'ope
           {Object.entries(bySub).sort((a, b) => b[1].length - a[1].length).map(([subName, subResources]) => {
             const sorted = [...subResources].sort((a, b) => b.rating - a.rating);
             return (
-              <div class="resource-subsection" data-subdiscipline={subName}>
-                <div style="font-size:11px;color:var(--color-text-faint);margin:8px 0 4px;padding-left:4px;">{subName} ({subResources.length})</div>
+                <div class="resource-subsection" data-subdiscipline={subName}>
+                  <div class="resource-subsection-title">{subName} ({subResources.length})</div>
                 {sorted.map(r => {
                   const status = statusMap[r.url];
                   const isUnderReview = !!status;

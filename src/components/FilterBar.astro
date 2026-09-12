@@ -65,16 +65,16 @@ const {
   <span class="result-count" id="result-count">{initialCount} resources</span>
 </div>
 
-<script is:inline>
+<script define:vars={{ searchId }} is:inline>
   const filterAccess = document.getElementById('filter-access');
   const filterType = document.getElementById('filter-type');
   const filterVerified = document.getElementById('filter-verified');
   const sortSelect = document.getElementById('sort-select');
   const resultCount = document.getElementById('result-count');
-  const searchInput = document.getElementById('{searchId}');
+  const searchInput = searchId ? document.getElementById(searchId) : null;
   const rows = document.querySelectorAll('.resource-row');
 
-  let debounceTimer: number;
+  let debounceTimer;
 
   function applyFilters() {
     const access = filterAccess.value;

@@ -3,13 +3,12 @@ import { CATALOG, kitTotal, itemCount } from '../lib/astroWizard.js';
 
 // Live Observation Deck: refined animated night-sky preview + reactive inventory.
 export default function AstroObservationDeck({ answers, kit }) {
-  const { target, environment, experience, budget } = answers || {};
+  const { target, environment, experience: _experience, budget: _budget } = answers || {};
   const [paused, setPaused] = useState(false);
   const total = useMemo(() => kitTotal(kit), [kit]);
   const gearCount = itemCount(kit);
 
   const cyan = '#38BDF8';
-  const purple = '#A855F7';
   const amber = '#F59E0B';
   const emerald = '#10B981';
   const slate = '#94A3B8';
@@ -324,7 +323,7 @@ export default function AstroObservationDeck({ answers, kit }) {
   );
 }
 
-function Telescope({ kind, target, hasGoto, cyan, emerald, amber }) {
+function Telescope({ kind, target, hasGoto, cyan, emerald, amber: _amber }) {
   // Tripod legs (default position)
   const Tripod = ({ cx = 185, top = 210 }) => (
     <g stroke={cyan} strokeWidth="1.2" fill="none">

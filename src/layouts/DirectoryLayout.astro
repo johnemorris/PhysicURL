@@ -143,7 +143,7 @@ const jsonLd = {
         <p style="margin-top:4px;">
           Resources are verified and curated.
           <a href="/">Browse all sciences</a> |
-          <a href="#" class="submit-link-btn" style="display:inline-flex;font-size:12px;padding:4px 12px;">+ Submit a Link</a> |
+          <a href="#" class="btn btn-primary" style="font-size:12px;padding:4px 12px;">+ Submit a Link</a> |
           <a href="/admin/">Admin</a>
         </p>
         <p class="affiliate-disclaimer">PhysicURL is a participant in the Amazon Associates Program. Links marked as affiliate may earn a commission on qualifying purchases at no extra cost to you. All affiliate links are disclosed with an "Affiliate" badge.</p>
@@ -152,11 +152,6 @@ const jsonLd = {
   </div>
 
   <script is:inline>
-    function navigateToScience(slug) {
-      const el = document.querySelector(`[data-science="${slug}"]`);
-      if (el) el.classList.add('open');
-      window.location.href = '/' + slug + '.html';
-    }
     document.getElementById('expand-all').addEventListener('click', () => {
       document.querySelectorAll('.tree-science').forEach(el => {
         el.classList.add('open');
@@ -188,7 +183,7 @@ const jsonLd = {
         toggle.setAttribute('aria-expanded', String(isOpen));
       }
     });
-    const currentPath = window.location.pathname.replace(/\.html$/, '').replace(/\/$/, '');
+    const currentPath = window.location.pathname.replace(/\.html$/, '').replace(//$/, '');
     const sciMatch = currentPath.match(/^\/([^\/]+)/);
     if (sciMatch) {
       const el = document.querySelector(`[data-science="${sciMatch[1]}"]`);

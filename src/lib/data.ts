@@ -1,5 +1,19 @@
+/**
+ * data.ts — shared constants and pure utility functions.
+ *
+ * This module is imported by BOTH server-side Astro pages (via data-node.ts)
+ * AND client-side React components (e.g. SubmitModal). Keep it free of any
+ * Node.js imports (fs, path) so it is safe to bundle in the browser.
+ *
+ * Node-only data-loading functions (loadResources, loadSubmissions, etc.) live
+ * in data-node.ts, which is only imported from Astro build-time code.
+ */
+
 import type { Resource, ScienceConfig, SEOContent, TreeScience, Submission } from './types';
 
+// ---------------------------------------------------------------------------
+// Science catalogue — single source of truth
+// ---------------------------------------------------------------------------
 export const SCIENCES: ScienceConfig[] = [
   { slug: 'physics', name: 'Physics', description: 'The fundamental science of matter, energy, space, and time. Browse databases, simulators, university programs, and research portals.', icon: 'atom' },
   { slug: 'chemistry', name: 'Chemistry', description: 'The science of matter — composition, structure, properties, and transformations. Browse databases, molecular tools, and educational platforms.', icon: 'flask' },
@@ -10,6 +24,23 @@ export const SCIENCES: ScienceConfig[] = [
   { slug: 'mathematical-physics', name: 'Mathematical Physics', description: 'Mathematical methods for physics. Browse computational tools, reference databases, and educational resources.', icon: 'sigma' },
 ];
 
+export const RESOURCE_TYPE_LABELS: Record<string, string> = {
+  portal: 'Portal', database: 'Database', journal: 'Journal', tool: 'Tool',
+  reference: 'Reference', educational: 'Educational', tutorial: 'Tutorial',
+  organization: 'Organization', book: 'Book', kit: 'Kit', equipment: 'Equipment',
+  course: 'Course', video: 'Video', supply: 'Supply',
+  portal_lab: 'Portal / Lab',
+};
+
+export const ACCESS_LABELS: Record<string, string> = {
+  free: 'Free', paid: 'Paid', freemium: 'Freemium', open_access: 'Open Access', open: 'Open', subscription: 'Subscription',
+};
+
+// ---------------------------------------------------------------------------
+// Pure utility functions — safe in both browser and Node
+// ---------------------------------------------------------------------------
+
+/** Normalise a raw JSON record into a typed Resource object. */
 export function normalizeResource(r: any): Resource {
   return {
     id: r.id,
@@ -30,23 +61,6 @@ export function normalizeResource(r: any): Resource {
     isAffiliate: r.isAffiliate ?? false,
     addedDate: r.addedDate || r.added,
   };
-}
-
-// Client-safe stubs - these only work in Astro build context
-export function loadResources(): Resource[] {
-  throw new Error('loadResources() can only be used in Astro build context (server-side)');
-}
-
-export function loadSubmissions(): Submission[] {
-  throw new Error('loadSubmissions() can only be used in Astro build context (server-side)');
-}
-
-export function loadSEOContent(): Record<string, SEOContent> {
-  throw new Error('loadSEOContent() can only be used in Astro build context (server-side)');
-}
-
-export function loadStatusMap(): Record<string, { status: string; details: string }> {
-  throw new Error('loadStatusMap() can only be used in Astro build context (server-side)');
 }
 
 export function slugify(name: string): string {
@@ -86,14 +100,24 @@ export function buildTree(resources: Resource[]): TreeScience[] {
   }));
 }
 
-export const RESOURCE_TYPE_LABELS: Record<string, string> = {
-  portal: 'Portal', database: 'Database', journal: 'Journal', tool: 'Tool',
-  reference: 'Reference', educational: 'Educational', tutorial: 'Tutorial',
-  organization: 'Organization', book: 'Book', kit: 'Kit', equipment: 'Equipment',
-  course: 'Course', video: 'Video', supply: 'Supply',
-  portal_lab: 'Portal / Lab',
-};
+// ---------------------------------------------------------------------------
+// Client-safe stubs — these only work in Astro build context (server-side).
+// They exist here so client bundles can import this file without breaking,
+// but must never actually be called in the browser.
+// ---------------------------------------------------------------------------
 
-export const ACCESS_LABELS: Record<string, string> = {
-  free: 'Free', paid: 'Paid', freemium: 'Freemium', open_access: 'Open Access', open: 'Open', subscription: 'Subscription',
-};
+export function loadResources(): Resource[] {
+  throw new Error('loadResources() can only be used in Astro build context (server-side)');
+}
+
+export function loadSubmissions(): Submission[] {
+  throw new Error('loadSubmissions() can only be used in Astro build context (server-side)');
+}
+
+export function loadSEOContent(): Record<string, SEOContent> {
+  throw new Error('loadSEOContent() can only be used in Astro build context (server-side)');
+}
+
+export function loadStatusMap(): Record<string, { status: string; details: string }> {
+  throw new Error('loadStatusMap() can only be used in Astro build context (server-side)');
+}

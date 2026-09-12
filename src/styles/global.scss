@@ -476,6 +476,14 @@ ul, ol { list-style: none; }
           padding-bottom: 4px;
           border-bottom: 1px solid var(--color-border-light);
         }
+
+        // Subdiscipline label inside a science section (smaller, indented)
+        .resource-subsection-title {
+          font-size: 11px;
+          color: var(--color-text-faint);
+          margin: 8px 0 4px;
+          padding-left: 4px;
+        }
       }
 
       .resource-row {
@@ -662,91 +670,8 @@ ul, ol { list-style: none; }
       }
     }
 
-    // --- Buttons ---
-    .btn {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      padding: 8px 16px;
-      border-radius: 8px;
-      font-size: 13px;
-      font-weight: 600;
-      cursor: pointer;
-      border: none;
-      text-decoration: none;
-
-      &.btn-primary {
-        background: var(--color-primary);
-        color: #000;
-        &:hover { background: #0EA5E9; }
-      }
-
-      &.btn-copy {
-        background: var(--color-surface-2);
-        color: var(--color-text-muted);
-        border: 1px solid var(--color-border);
-        &:hover { background: var(--color-surface-3); }
-      }
-    }
-
-    // --- Submit Modal ---
-    .submit-modal-overlay {
-      position: fixed;
-      inset: 0;
-      background: rgba(0, 0, 0, .6);
-      z-index: 300;
-      display: none;
-
-      &.open {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-      }
-
-      .submit-modal {
-        background: var(--color-surface);
-        border: 1px solid var(--color-border);
-        border-radius: 12px;
-        padding: 32px;
-        max-width: 500px;
-        width: 90%;
-
-        h2 { font-size: 20px; font-weight: 700; margin-bottom: 16px; }
-
-        .submit-form {
-          display: flex;
-          flex-direction: column;
-          gap: 12px;
-
-          input, select, textarea {
-            background: var(--color-canvas);
-            border: 1px solid var(--color-border);
-            border-radius: 8px;
-            padding: 10px 14px;
-            color: var(--color-text);
-            font-size: 13px;
-            outline: none;
-
-            &:focus { border-color: var(--color-primary); }
-          }
-        }
-      }
-    }
-
-    .submit-link-btn {
-      background: var(--color-primary);
-      color: #000;
-      padding: 8px 16px;
-      border-radius: 8px;
-      font-size: 13px;
-      font-weight: 600;
-      border: none;
-      cursor: pointer;
-      text-decoration: none;
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-    }
+    // Note: .btn base class is defined globally below (after .app block) —
+    // moved out of .main so btn btn-primary works in footers, pages, etc.
 
     // --- Footer ---
     .footer {
@@ -1060,6 +985,52 @@ ul, ol { list-style: none; }
         margin-top: 8px;
       }
     }
+  }
+}
+
+// ===== Global Button System =====
+// Use `.btn` as the base class with a modifier for variant:
+//   <button class="btn btn-primary">…</button>
+// Standalone .btn-primary / .btn-secondary / .btn-danger still work for
+// React components where a compound class name is less convenient.
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  text-decoration: none;
+  font-family: inherit;
+
+  &.btn-primary {
+    background: var(--color-primary);
+    color: #001220;
+    &:hover:not(:disabled) { background: #7dd3fc; }
+    &:disabled { opacity: 0.5; cursor: not-allowed; }
+  }
+
+  &.btn-secondary {
+    background: var(--color-surface-2);
+    color: var(--color-text);
+    border: 1px solid var(--color-border);
+    &:hover:not(:disabled) { background: var(--color-surface-3); }
+  }
+
+  &.btn-copy {
+    background: var(--color-surface-2);
+    color: var(--color-text-muted);
+    border: 1px solid var(--color-border);
+    &:hover { background: var(--color-surface-3); }
+  }
+
+  &.btn-lg {
+    font-size: 14px;
+    padding: 12px 24px;
   }
 }
 

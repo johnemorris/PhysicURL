@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 // Refined animated lab preview: richer environment context, better silhouettes,
 // live stirring, flame flicker, water-flow condenser, cleaner molecule.
 export default function ChemLabPreview({ answers, kit, total }) {
-  const { user, space, focus, budget } = answers || {};
+  const { user, space, focus, budget: _budget } = answers || {};
   const [paused, setPaused] = useState(false);
   const [tick, setTick] = useState(0); // used for triggering steam wisps
   const gearCount = kit ? kit.safety.length + kit.core.length + kit.specialized.length : 0;
