@@ -6,6 +6,11 @@ import path from 'path';
 import crypto from 'crypto';
 import cookieParser from 'cookie-parser';
 import { fileURLToPath } from 'url';
+import {
+  checkResources,
+  getResourceHealthStats,
+  loadResourceStatusFile,
+} from '../src/lib/resource-health/index.ts';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -15,7 +20,9 @@ app.use(express.json({ limit: '1mb' }));
 app.use(cookieParser());
 
 // Data paths (writable at runtime in sandbox)
-const DATA_DIR = path.join(__dirname, '..', 'data');
+const DATA_DIR = process.env.PHYSICURL_DATA_DIR
+  ? path.resolve(process.env.PHYSICURL_DATA_DIR)
+  : path.join(__dirname, '..', 'data');
 const SUBMISSIONS_FILE = path.join(DATA_DIR, 'submissions.json');
 const RESOURCES_FILE = path.join(DATA_DIR, 'resources.json');
 const STATUS_FILE = path.join(DATA_DIR, 'resource_status.json');
@@ -103,9 +110,9 @@ app.get('/api/csrf-token', (req, res) => {
 app.get('/api/stats', (req, res) => {
   const resources = readJson(RESOURCES_FILE, []);
   const submissions = readJson(SUBMISSIONS_FILE, []);
-  const status = readJson(STATUS_FILE, {});
+  const status = loadResourceStatusFile(STATUS_FILE);
   const pending = submissions.filter(s => s.status === 'pending').length;
-  const underReview = Object.values(status).filter(s => s.under_review).length;
+  const healthStats = getResourceHealthStats(resources.map(resource => resource.url), status);
   const verified = resources.filter(r => r.verified).length;
   const bySci = {};
   for (const r of resources) {
@@ -114,7 +121,10 @@ app.get('/api/stats', (req, res) => {
   res.json({
     total_resources: resources.length,
     verified,
-    under_review: underReview,
+    active: healthStats.active,
+    under_review: healthStats.underReview,
+    confirmed_broken: healthStats.confirmedBroken,
+    health_checked: healthStats.checked,
     pending_submissions: pending,
     by_science: bySci,
   });
@@ -221,7 +231,13 @@ app.post('/api/admin/submissions/:id', requireAuth, requireCsrf, (req, res) => {
 // Admin: list resources
 app.get('/api/admin/resources', requireAuth, (req, res) => {
   const resources = readJson(RESOURCES_FILE, []);
-  res.json({ resources });
+  const status = loadResourceStatusFile(STATUS_FILE);
+  res.json({
+    resources: resources.map(resource => ({
+      ...resource,
+      health: status[resource.url] ?? { reviewState: 'active', consecutiveFailures: 0 },
+    })),
+  });
 });
 
 // Admin: update resource - with CSRF
@@ -278,21 +294,24 @@ app.post('/api/admin/bulk-import', requireAuth, requireCsrf, (req, res) => {
 // Admin: URL health check - with CSRF
 app.post('/api/admin/health-check', requireAuth, requireCsrf, async (req, res) => {
   const resources = readJson(RESOURCES_FILE, []);
-  const results = [];
-  const limit = Math.min(parseInt(req.query.limit) || 50, resources.length);
-  for (let i = 0; i < limit; i++) {
-    const r = resources[i];
-    try {
-      const controller = new AbortController();
-      const timeout = setTimeout(() => controller.abort(), 5000);
-      const resp = await fetch(r.url, { method: 'HEAD', signal: controller.signal, redirect: 'follow' });
-      clearTimeout(timeout);
-      results.push({ url: r.url, status: resp.status, ok: resp.ok });
-    } catch (e) {
-      results.push({ url: r.url, status: 0, ok: false, error: e.message });
-    }
+  const requestedLimit = Number.parseInt(String(req.query.limit ?? '50'), 10);
+  const limit = Math.min(Number.isFinite(requestedLimit) ? requestedLimit : 50, resources.length, 500);
+  try {
+    const run = await checkResources(resources, {
+      statusFile: STATUS_FILE,
+      limit,
+      concurrency: 5,
+    });
+    res.json({
+      ok: true,
+      checked: run.results.length,
+      summary: run.summary,
+      results: run.results,
+    });
+  } catch (error) {
+    console.error('[url-health] check run failed', error instanceof Error ? error.message : error);
+    res.status(500).json({ error: 'health check failed' });
   }
-  res.json({ ok: true, checked: results.length, results });
 });
 
 const PORT = parseInt(process.env.PORT || '5000', 10);

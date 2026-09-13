@@ -3,6 +3,7 @@ import DirectoryLayout from '../../../layouts/DirectoryLayout.astro';
 import { loadResources, loadStatusMap, buildTree, SCIENCES, RESOURCE_TYPE_LABELS, ACCESS_LABELS, slugify } from '../../../lib/data-node';
 import FilterBar from '../../../components/FilterBar.astro';
 import ResourceRow from '../../../components/ResourceRow.astro';
+import { isUnderReview, reviewDetails } from '../../../lib/resource-health';
 
 export function getStaticPaths() {
   const resources = loadResources();
@@ -52,13 +53,13 @@ const verifiedCount = subResources.filter(r => r.isVerified).length;
       <div class="resource-section-title">{subdiscipline} ({subResources.length})</div>
       {sorted.map(r => {
         const status = statusMap[r.url];
-        const isUnderReview = !!status;
+        const underReview = isUnderReview(status);
         return (
           <ResourceRow
             resource={{
               ...r,
-              isUnderReview,
-              reviewDetails: status?.details || 'Under review',
+              isUnderReview: underReview,
+              reviewDetails: reviewDetails(status),
             }}
             accessLabels={ACCESS_LABELS}
           />

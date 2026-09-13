@@ -18,7 +18,10 @@ src/
   layouts/          Astro layouts (DirectoryLayout with sidebar tree)
   pages/            File-routed pages: index, [science], [science]/[subdiscipline], admin
   components/       React islands: SubmitModal, AdminDashboard, ResourceExplorer, SidebarSearch
-  lib/              data.ts, scienceContent.js, scienceDiagrams.js
+  lib/
+    url-health/       Reusable URL-only diagnostics, safe redirects, and SSRF guard
+    resource-health/  PhysicURL review workflow and atomic status persistence
+    data.ts, scienceContent.js, scienceDiagrams.js
   styles/global.scss  Design system + all component styles
 data/
   resources.json          541 curated resources
@@ -41,7 +44,7 @@ Deep Dark Matter / Quantum Terminal theme:
 ```bash
 npm install
 npm run dev         # Astro dev server
-node server/server.js   # Express API (port 5000)
+node server/server.js   # Express API (port 5000; Node 22.18+)
 npm run build       # static build to dist/
 ```
 
@@ -51,4 +54,8 @@ npm run build       # static build to dist/
 
 ## Health check
 
-Weekly cron re-verifies every URL and marks status (live / dead / repurposed) into `data/resource_status.json`.
+The admin health check uses `src/lib/url-health/` to collect URL observations. It validates DNS and every redirect target against local/private address ranges, tries HEAD first, and confirms inconclusive responses with a size-limited GET. The reusable checker never assigns PhysicURL workflow states.
+
+`src/lib/resource-health/` applies conservative PhysicURL rules and persists one record per URL in `data/resource_status.json` using atomic file replacement. Records separate `reviewState` (`active`, `under_review`, or `confirmed_broken`) from `lastCheck`. Automated checks may enter or preserve `under_review`, but never assign `confirmed_broken` or automatically clear an existing review decision.
+
+Legacy `dead`, `timeout`, `repurposed`, `details`, and related fields are normalized on read. Their prior review meaning and original JSON values are retained under `legacy`; the next status write atomically stores the normalized structure.

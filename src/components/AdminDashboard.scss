@@ -1,0 +1,58 @@
+.admin-dashboard {
+  .status-pill {
+    &.health-under_review {
+      background: rgba(245, 158, 11, 0.15);
+      color: var(--color-amber);
+    }
+
+    &.health-confirmed_broken {
+      background: rgba(239, 68, 68, 0.15);
+      color: #f87171;
+    }
+  }
+
+  .health-check-panel {
+    .health-check-description {
+      color: var(--color-text-muted);
+      font-size: 0.8125rem;
+    }
+
+    .health-check-results {
+      margin-top: 1rem;
+    }
+
+    .health-check-summary,
+    .health-check-error {
+      font-size: 0.8125rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .health-check-error {
+      color: var(--color-amber);
+    }
+
+    .health-check-list {
+      max-height: 25rem;
+      overflow: auto;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+    }
+
+    .health-check-result {
+      color: var(--color-amber);
+      padding: 0.125rem 0;
+
+      &.status-healthy {
+        color: var(--color-emerald);
+      }
+    }
+  }
+}
+
+@media (max-width: 48rem) {
+  .admin-dashboard {
+    .health-check-list {
+      max-height: 18.75rem;
+    }
+  }
+}

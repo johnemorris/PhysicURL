@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import './AdminDashboard.scss';
 
 const API = import.meta.env.PUBLIC_API_URL || 'http://localhost:5000';
 
@@ -147,6 +148,8 @@ export default function AdminDashboard() {
     try {
       const j = await authFetch('/api/admin/health-check?limit=100', { method: 'POST' });
       setHealth({ running: false, ...j });
+      await loadStats();
+      if (tab === 'resources') await loadResources();
     } catch (err) {
       setHealth({ running: false, error: err.message });
     }
@@ -204,7 +207,10 @@ export default function AdminDashboard() {
         <div className="admin-stats">
           <div className="stat"><div className="stat-num">{stats.total_resources}</div><div className="stat-label">Total</div></div>
           <div className="stat"><div className="stat-num">{stats.verified}</div><div className="stat-label">Verified</div></div>
+          <div className="stat"><div className="stat-num">{stats.active}</div><div className="stat-label">Active</div></div>
           <div className="stat"><div className="stat-num">{stats.under_review}</div><div className="stat-label">Under Review</div></div>
+          <div className="stat"><div className="stat-num">{stats.confirmed_broken}</div><div className="stat-label">Confirmed Broken</div></div>
+          <div className="stat"><div className="stat-num">{stats.health_checked}</div><div className="stat-label">Health Checked</div></div>
           <div className="stat"><div className="stat-num">{stats.pending_submissions}</div><div className="stat-label">Pending</div></div>
         </div>
       )}
@@ -260,8 +266,22 @@ export default function AdminDashboard() {
                 ) : (
                   <>
                     <div>
-                      <div className="row-title">{r.name} {r.verified && <span className="status-pill verified">✓</span>}</div>
+                      <div className="row-title">
+                        {r.name}
+                        {r.verified && <span className="status-pill verified">✓</span>}
+                        {r.health?.reviewState && r.health.reviewState !== 'active' && (
+                          <span className={`status-pill health-${r.health.reviewState}`}>
+                            {r.health.reviewState.replaceAll('_', ' ')}
+                          </span>
+                        )}
+                      </div>
                       <div className="row-meta">{r.science} · {r.subdiscipline} · <a href={r.url} target="_blank">{r.url}</a></div>
+                      {r.health?.lastCheck && (
+                        <div className="row-meta">
+                          Last check: {r.health.lastCheck.status} · {r.health.lastCheck.reason.replaceAll('_', ' ')}
+                          {r.health.lastCheck.httpStatus && ` · HTTP ${r.health.lastCheck.httpStatus}`}
+                        </div>
+                      )}
                     </div>
                     <div className="row-actions">
                       <button onClick={() => startEdit(i)} className="btn-secondary">Edit</button>
@@ -295,21 +315,29 @@ export default function AdminDashboard() {
       )}
 
       {tab === 'health-check' && (
-        <div className="admin-panel">
+        <div className="admin-panel health-check-panel">
           <h3>URL Health Check</h3>
-          <p style={{ color: 'var(--color-text-muted)', fontSize: 13 }}>Runs HEAD requests against the first 100 resource URLs.</p>
+          <p className="health-check-description">Checks the first 100 resource URLs with safe redirects and GET confirmation when HEAD is inconclusive.</p>
           <div className="row-actions">
             <button onClick={runHealth} disabled={busy || health?.running} className="btn-primary">
               {health?.running ? 'Checking…' : 'Run health check'}
             </button>
           </div>
           {health && !health.running && (
-            <div style={{ marginTop: 16 }}>
-              <div style={{ fontSize: 13, marginBottom: 8 }}>Checked {health.checked} URLs.</div>
-              <div style={{ maxHeight: 400, overflow: 'auto', fontSize: 12, fontFamily: 'var(--font-mono)' }}>
+            <div className="health-check-results">
+              {health.error ? (
+                <div className="health-check-error">{health.error}</div>
+              ) : (
+                <div className="health-check-summary">
+                  Checked {health.checked} URLs: {health.summary?.healthy ?? 0} healthy,{' '}
+                  {health.summary?.suspicious ?? 0} suspicious, {health.summary?.unreachable ?? 0} unreachable.
+                </div>
+              )}
+              <div className="health-check-list">
                 {(health.results || []).map((r, i) => (
-                  <div key={i} style={{ color: r.ok ? 'var(--color-emerald)' : 'var(--color-amber)', padding: '2px 0' }}>
-                    [{r.status || 'ERR'}] {r.url}
+                  <div key={i} className={`health-check-result status-${r.status}`}>
+                    [{r.status}] {r.requestedUrl} · {r.reason.replaceAll('_', ' ')}
+                    {r.httpStatus && ` · HTTP ${r.httpStatus}`} · {r.reviewState.replaceAll('_', ' ')}
                   </div>
                 ))}
               </div>

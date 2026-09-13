@@ -10,6 +10,7 @@
  */
 
 import type { Resource, ScienceConfig, SEOContent, TreeScience, Submission } from './types';
+import type { ResourceStatusMap } from './resource-health/types';
 
 // ---------------------------------------------------------------------------
 // Science catalogue — single source of truth
@@ -118,6 +119,6 @@ export function loadSEOContent(): Record<string, SEOContent> {
   throw new Error('loadSEOContent() can only be used in Astro build context (server-side)');
 }
 
-export function loadStatusMap(): Record<string, { status: string; details: string }> {
+export function loadStatusMap(): ResourceStatusMap {
   throw new Error('loadStatusMap() can only be used in Astro build context (server-side)');
 }

@@ -5,6 +5,7 @@ import { scienceContent } from '../../lib/scienceContent.js';
 import { scienceDiagrams } from '../../lib/scienceDiagrams.js';
 import FilterBar from '../../components/FilterBar.astro';
 import ResourceRow from '../../components/ResourceRow.astro';
+import { isUnderReview, reviewDetails } from '../../lib/resource-health';
 
 export function getStaticPaths() {
   const resources = loadResources();
@@ -150,13 +151,13 @@ const faqJsonLd = seo.faq.length > 0 ? {
           <div class="resource-section-title">{subName} ({subResources.length})</div>
           {sorted.map(r => {
             const status = statusMap[r.url];
-            const isUnderReview = !!status;
+            const underReview = isUnderReview(status);
             return (
               <ResourceRow
                 resource={{
                   ...r,
-                  isUnderReview,
-                  reviewDetails: status?.details || 'Under review',
+                  isUnderReview: underReview,
+                  reviewDetails: reviewDetails(status),
                 }}
                 accessLabels={ACCESS_LABELS}
               />

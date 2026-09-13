@@ -13,7 +13,9 @@
 import { readFileSync } from 'fs';
 import { join } from 'path';
 import type { Resource, SEOContent, Submission } from './types';
+import type { ResourceStatusMap } from './resource-health';
 import { normalizeResource } from './data';
+import { normalizeResourceStatusMap } from './resource-health';
 
 // Re-export everything from data.ts so callers only need to import from here.
 export {
@@ -53,10 +55,10 @@ export function loadSEOContent(): Record<string, SEOContent> {
   }
 }
 
-export function loadStatusMap(): Record<string, { status: string; details: string }> {
+export function loadStatusMap(): ResourceStatusMap {
   try {
     const raw = readFileSync(join(DATA_DIR, 'resource_status.json'), 'utf-8');
-    return JSON.parse(raw);
+    return normalizeResourceStatusMap(JSON.parse(raw));
   } catch {
     return {};
   }

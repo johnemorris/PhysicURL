@@ -97,7 +97,7 @@ export default function ResourceExplorer({ resources = [], scienceScope = null, 
             <div className="resource-section-title">{sub} <span style={{ opacity: 0.5 }}>({items.length})</span></div>
             {items.map((r) => {
               const st = statusMap[r.url] || {};
-              const underReview = st.under_review;
+              const underReview = st.reviewState === 'under_review';
               return (
                 <div key={r.id || r.url} className={`resource-row ${underReview ? 'under-review' : ''}`}>
                   <div className="resource-title-line">

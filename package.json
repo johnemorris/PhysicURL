@@ -2,11 +2,15 @@
   "name": "physicurl",
   "type": "module",
   "version": "2.0.1",
+  "engines": {
+    "node": ">=22.18"
+  },
   "scripts": {
     "dev": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
     "lint": "eslint src --ext .js,.jsx,.ts,.tsx,.astro",
+    "test": "node --test src/lib/url-health/__tests__/*.test.ts src/lib/resource-health/__tests__/*.test.ts",
     "typecheck": "tsc --noEmit",
     "validate": "node scripts/validate-data.mjs"
   },
