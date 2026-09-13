@@ -1,6 +1,6 @@
 import { checkUrl, type UrlHealthResult } from '../url-health/index.ts';
 import { persistDiagnostics } from './status-store.ts';
-import type { ResourceStatusMap } from './types.ts';
+import type { ResourceReviewConcern, ResourceStatusMap } from './types.ts';
 
 interface CheckableResource {
   url: string;
@@ -15,6 +15,7 @@ export interface ResourceCheckSummary {
 
 export interface CheckedResourceResult extends UrlHealthResult {
   reviewState: 'active' | 'under_review' | 'confirmed_broken';
+  reviewConcern?: ResourceReviewConcern;
 }
 
 export interface ResourceCheckRun {
@@ -89,6 +90,9 @@ export async function checkResources(
   const results = diagnostics.map((result): CheckedResourceResult => ({
     ...result,
     reviewState: statusMap[result.requestedUrl]?.reviewState ?? 'active',
+    ...(statusMap[result.requestedUrl]?.reviewConcern
+      ? { reviewConcern: statusMap[result.requestedUrl].reviewConcern }
+      : {}),
   }));
   const summary = results.reduce<ResourceCheckSummary>((counts, result) => {
     counts[result.status] += 1;

@@ -7,6 +7,8 @@ import type { ResourceHealthStats, ResourceStatusMap } from './types.ts';
 import { applyDiagnosticToResource } from './workflow.ts';
 
 const writeQueues = new Map<string, Promise<void>>();
+// This serializes writes within the current server process. A future
+// multi-process deployment would require external coordination.
 
 export function loadResourceStatusFile(file: string): ResourceStatusMap {
   try {

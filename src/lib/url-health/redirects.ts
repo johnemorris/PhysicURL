@@ -3,9 +3,11 @@ import { UrlTargetError, validateUrlTarget } from './ssrf-guard.ts';
 import type {
   HostResolver,
   HttpMethod,
+  UrlHealthTransport,
+  UrlHealthTransportResponse,
   UrlHealthEvidence,
-  UrlHealthFetch,
   UrlHealthReason,
+  ValidatedUrlTarget,
 } from './types.ts';
 
 export class RedirectError extends Error {
@@ -37,7 +39,7 @@ export class RedirectError extends Error {
 }
 
 export interface RedirectRequestOptions {
-  fetch: UrlHealthFetch;
+  transport: UrlHealthTransport;
   resolve: HostResolver;
   method: HttpMethod;
   timeoutMs: number;
@@ -46,7 +48,7 @@ export interface RedirectRequestOptions {
 }
 
 export interface RedirectResponse {
-  response: Response;
+  response: UrlHealthTransportResponse;
   finalUrl: string;
   redirectCount: number;
   evidence: UrlHealthEvidence[];
@@ -60,13 +62,22 @@ export async function requestWithSafeRedirects(
   const visited = new Set<string>();
   const evidence: UrlHealthEvidence[] = [];
   let redirectCount = 0;
+  let preparedTarget: ValidatedUrlTarget | undefined;
 
   while (true) {
-    let validated: URL;
+    let validated: ValidatedUrlTarget;
     try {
-      validated = (await validateUrlTarget(current, options.resolve)).url;
+      validated = preparedTarget ?? await validateUrlTarget(current, options.resolve);
+      preparedTarget = undefined;
     } catch (error) {
       if (error instanceof UrlTargetError) {
+        if (redirectCount > 0) {
+          evidence.push({
+            type: 'unsafe_redirect',
+            message: `Redirect target was rejected before connection: ${error.message}`,
+            value: current,
+          });
+        }
         throw new RedirectError(
           error.reason,
           error.message,
@@ -78,37 +89,25 @@ export async function requestWithSafeRedirects(
       throw error;
     }
 
-    const normalized = validated.href;
+    const normalized = validated.url.href;
     if (visited.has(normalized)) {
       evidence.push({ type: 'redirect_loop', message: 'Redirect revisited an earlier URL', value: normalized });
       throw new RedirectError('redirect_loop', 'Redirect loop detected', redirectCount, evidence, normalized);
     }
     visited.add(normalized);
 
-    const controller = new AbortController();
-    const timer = setTimeout(() => controller.abort(), options.timeoutMs);
-    let response: Response;
-    try {
-      response = await options.fetch(normalized, {
-        method: options.method,
-        redirect: 'manual',
-        signal: controller.signal,
-        headers: {
-          'User-Agent': options.userAgent,
-          Accept: options.method === 'HEAD' ? '*/*' : 'text/html,application/xhtml+xml,application/pdf;q=0.9,*/*;q=0.5',
-        },
-      });
-    } finally {
-      clearTimeout(timer);
-    }
+    const response = await options.transport({
+      ...validated,
+      method: options.method,
+      timeoutMs: options.timeoutMs,
+      userAgent: options.userAgent,
+    });
 
     if (!REDIRECT_STATUSES.has(response.status)) {
       return { response, finalUrl: normalized, redirectCount, evidence };
     }
 
-    await response.body?.cancel().catch(() => undefined);
-
-    const location = response.headers.get('location');
+    const location = response.headers.location;
     if (!location) {
       evidence.push({
         type: 'invalid_redirect',
@@ -123,6 +122,7 @@ export async function requestWithSafeRedirects(
         message: `Redirect limit of ${options.maxRedirects} was exceeded`,
         value: location,
       });
+      response.close();
       throw new RedirectError(
         'too_many_redirects',
         'Too many redirects',
@@ -136,12 +136,14 @@ export async function requestWithSafeRedirects(
     try {
       next = new URL(location, normalized);
     } catch {
+      response.close();
       evidence.push({ type: 'invalid_redirect', message: 'Redirect target is not a valid URL', value: location });
       throw new RedirectError('invalid_url', 'Redirect target is invalid', redirectCount, evidence, normalized);
     }
 
+    response.close();
     try {
-      await validateUrlTarget(next, options.resolve);
+      preparedTarget = await validateUrlTarget(next, options.resolve);
     } catch (error) {
       if (error instanceof UrlTargetError) {
         evidence.push({
@@ -160,14 +162,14 @@ export async function requestWithSafeRedirects(
       message: `HTTP ${response.status} redirected to ${next.href}`,
       value: response.status,
     });
-    if (validated.protocol === 'http:' && next.protocol === 'https:') {
+    if (validated.url.protocol === 'http:' && next.protocol === 'https:') {
       evidence.push({ type: 'protocol_upgrade', message: 'Redirect upgraded HTTP to HTTPS', value: true });
     }
-    if (validated.hostname.toLowerCase() !== next.hostname.toLowerCase()) {
+    if (validated.url.hostname.toLowerCase() !== next.hostname.toLowerCase()) {
       evidence.push({
         type: 'host_changed',
-        message: `Redirect changed host from ${validated.hostname} to ${next.hostname}`,
-        value: `${validated.hostname}|${next.hostname}`,
+        message: `Redirect changed host from ${validated.url.hostname} to ${next.hostname}`,
+        value: `${validated.url.hostname}|${next.hostname}`,
       });
     }
     current = next.href;

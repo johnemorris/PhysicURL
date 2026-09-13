@@ -1,5 +1,5 @@
 import type { UrlHealthResult } from '../url-health/index.ts';
-import type { ResourceHealthRecord } from './types.ts';
+import type { ResourceHealthRecord, ResourceReviewConcern } from './types.ts';
 
 const IMMEDIATE_REVIEW_REASONS = new Set([
   'invalid_url',
@@ -51,7 +51,7 @@ function isUnusableResponse(result: UrlHealthResult): boolean {
 
 export function diagnosticWarrantsReview(
   result: UrlHealthResult,
-  priorConsecutiveFailures = 0,
+  priorConsecutiveServerFailures = 0,
 ): boolean {
   // A cross-domain redirect is an investigation signal, not a determination
   // that content was repurposed. Canonical/subdomain redirects remain active.
@@ -59,7 +59,7 @@ export function diagnosticWarrantsReview(
   if (result.status === 'healthy' || result.reason === 'blocked') return false;
   if (IMMEDIATE_REVIEW_REASONS.has(result.reason)) return true;
   if (isStrongHttpFailure(result) || isUnusableResponse(result)) return true;
-  if (isTemporaryServerFailure(result)) return priorConsecutiveFailures + 1 >= 2;
+  if (isTemporaryServerFailure(result)) return priorConsecutiveServerFailures + 1 >= 2;
   return false;
 }
 
@@ -70,15 +70,25 @@ function summarizeDiagnostic(result: UrlHealthResult): string {
   return `Automated check: ${result.reason.replaceAll('_', ' ')}`;
 }
 
+function concernFromDiagnostic(result: UrlHealthResult): ResourceReviewConcern {
+  const legacyDetails = result.evidence.find((entry) => entry.type === 'legacy_details')?.message;
+  return {
+    reason: result.reason,
+    observedAt: result.checkedAt,
+    summary: legacyDetails ?? summarizeDiagnostic(result),
+    ...(result.httpStatus !== undefined ? { httpStatus: result.httpStatus } : {}),
+  };
+}
+
 export function applyDiagnosticToResource(
   previous: ResourceHealthRecord | undefined,
   result: UrlHealthResult,
 ): ResourceHealthRecord {
-  const priorFailures = previous?.consecutiveFailures ?? 0;
-  const consecutiveFailures = result.status === 'healthy' || result.reason === 'blocked'
-    ? 0
-    : priorFailures + 1;
-  const warrantsReview = diagnosticWarrantsReview(result, priorFailures);
+  const priorServerFailures = previous?.consecutiveServerFailures ?? 0;
+  const consecutiveServerFailures = isTemporaryServerFailure(result)
+    ? priorServerFailures + 1
+    : 0;
+  const warrantsReview = diagnosticWarrantsReview(result, priorServerFailures);
 
   // Automation can raise a concern, but only an explicit human workflow may
   // clear review or assign confirmed_broken.
@@ -87,16 +97,19 @@ export function applyDiagnosticToResource(
     : previous?.reviewState === 'under_review' || warrantsReview
       ? 'under_review'
       : 'active';
+  const preservesCurrentReview = previous?.reviewState === 'under_review'
+    || previous?.reviewState === 'confirmed_broken';
+  const reviewConcern = preservesCurrentReview && previous?.reviewConcern
+    ? previous.reviewConcern
+    : warrantsReview
+      ? concernFromDiagnostic(result)
+      : previous?.reviewConcern;
 
   return {
     reviewState,
     lastCheck: result,
-    consecutiveFailures,
-    ...(reviewState === 'under_review'
-      ? { reviewDetails: previous?.reviewDetails ?? summarizeDiagnostic(result) }
-      : previous?.reviewDetails
-        ? { reviewDetails: previous.reviewDetails }
-        : {}),
+    ...(reviewConcern ? { reviewConcern } : {}),
+    consecutiveServerFailures,
     updatedAt: result.checkedAt,
     ...(previous?.legacy ? { legacy: previous.legacy } : {}),
   };

@@ -3,6 +3,37 @@ import './AdminDashboard.scss';
 
 const API = import.meta.env.PUBLIC_API_URL || 'http://localhost:5000';
 
+function formatCheckDate(value) {
+  if (!value) return 'date unavailable';
+  const date = new Date(value);
+  return Number.isNaN(date.getTime()) ? 'date unavailable' : date.toLocaleDateString();
+}
+
+function latestCheckText(check) {
+  if (!check) return 'Not checked';
+  const label = check.status === 'healthy' ? '✓ Healthy' : check.status.replaceAll('_', ' ');
+  return `${label}${check.httpStatus ? ` — HTTP ${check.httpStatus}` : ''} — ${formatCheckDate(check.checkedAt)}`;
+}
+
+function ReviewStatusSummary({ reviewState, reviewConcern, lastCheck }) {
+  if (reviewState !== 'under_review') return null;
+  const recovered = lastCheck?.status === 'healthy';
+  return (
+    <div className="review-status-summary">
+      <div className="review-status-line">
+        <span>Original concern</span>
+        <strong>{reviewConcern?.summary || 'Prior concern retained for review'}</strong>
+        <small>{formatCheckDate(reviewConcern?.observedAt)}</small>
+      </div>
+      <div className={`review-status-line latest-${lastCheck?.status || 'unknown'}`}>
+        <span>Latest check</span>
+        <strong>{latestCheckText(lastCheck)}</strong>
+      </div>
+      {recovered && <div className="manual-review-note">Manual reactivation required</div>}
+    </div>
+  );
+}
+
 export default function AdminDashboard() {
   const [token, setToken] = useState(null);
   const [password, setPassword] = useState('');
@@ -276,7 +307,13 @@ export default function AdminDashboard() {
                         )}
                       </div>
                       <div className="row-meta">{r.science} · {r.subdiscipline} · <a href={r.url} target="_blank">{r.url}</a></div>
-                      {r.health?.lastCheck && (
+                      {r.health?.reviewState === 'under_review' ? (
+                        <ReviewStatusSummary
+                          reviewState={r.health.reviewState}
+                          reviewConcern={r.health.reviewConcern}
+                          lastCheck={r.health.lastCheck}
+                        />
+                      ) : r.health?.lastCheck && (
                         <div className="row-meta">
                           Last check: {r.health.lastCheck.status} · {r.health.lastCheck.reason.replaceAll('_', ' ')}
                           {r.health.lastCheck.httpStatus && ` · HTTP ${r.health.lastCheck.httpStatus}`}
@@ -336,8 +373,15 @@ export default function AdminDashboard() {
               <div className="health-check-list">
                 {(health.results || []).map((r, i) => (
                   <div key={i} className={`health-check-result status-${r.status}`}>
-                    [{r.status}] {r.requestedUrl} · {r.reason.replaceAll('_', ' ')}
-                    {r.httpStatus && ` · HTTP ${r.httpStatus}`} · {r.reviewState.replaceAll('_', ' ')}
+                    <div>
+                      [{r.status}] {r.requestedUrl} · {r.reason.replaceAll('_', ' ')}
+                      {r.httpStatus && ` · HTTP ${r.httpStatus}`} · {r.reviewState.replaceAll('_', ' ')}
+                    </div>
+                    <ReviewStatusSummary
+                      reviewState={r.reviewState}
+                      reviewConcern={r.reviewConcern}
+                      lastCheck={r}
+                    />
                   </div>
                 ))}
               </div>

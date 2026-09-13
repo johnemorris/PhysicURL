@@ -5,9 +5,11 @@ import {
   DEFAULT_USER_AGENT,
   HEAD_CONCLUSIVE_STATUSES,
 } from './constants.ts';
+import { isAxiosError } from 'axios';
+import { axiosTransport } from './axios-transport.ts';
 import { classifyHttpResponse } from './classify-result.ts';
 import { RedirectError, requestWithSafeRedirects, type RedirectResponse } from './redirects.ts';
-import { defaultHostResolver, UrlTargetError, validateUrlTarget } from './ssrf-guard.ts';
+import { defaultHostResolver, UrlTargetError } from './ssrf-guard.ts';
 import type {
   HttpMethod,
   UrlHealthEvidence,
@@ -36,15 +38,16 @@ function classifyRequestError(error: unknown): RequestFailure {
     };
   }
 
+  const axiosCode = isAxiosError(error) ? error.code : undefined;
   const record = error && typeof error === 'object' ? error as Record<string, unknown> : {};
   const cause = record.cause && typeof record.cause === 'object'
     ? record.cause as Record<string, unknown>
     : {};
   const name = String(record.name ?? '');
-  const code = String(cause.code ?? record.code ?? '');
+  const code = String(cause.code ?? axiosCode ?? record.code ?? '');
   const message = error instanceof Error ? error.message : 'Request failed';
 
-  if (name === 'AbortError' || code === 'ABORT_ERR' || /abort|timeout/i.test(message)) {
+  if (name === 'AbortError' || ['ABORT_ERR', 'ECONNABORTED', 'ETIMEDOUT'].includes(code) || /abort|timeout/i.test(message)) {
     return { status: 'unreachable', reason: 'timeout', message };
   }
   if (['ENOTFOUND', 'EAI_AGAIN', 'EAI_FAIL'].includes(code)) {
@@ -56,32 +59,32 @@ function classifyRequestError(error: unknown): RequestFailure {
   return { status: 'unreachable', reason: 'connection_error', message };
 }
 
-async function readBodySample(response: Response, maxBodyBytes: number, timeoutMs: number): Promise<{
+async function readBodySample(
+  response: RedirectResponse['response'],
+  maxBodyBytes: number,
+  timeoutMs: number,
+): Promise<{
   sample?: string;
   evidence: UrlHealthEvidence[];
 }> {
   if (!response.body) return { evidence: [] };
 
-  const contentType = response.headers.get('content-type') ?? '';
+  const contentType = response.headers['content-type'] ?? '';
   if (!/text|html|json|xml|javascript/i.test(contentType)) {
-    await response.body.cancel();
     return { evidence: [] };
   }
 
-  const reader = response.body.getReader();
   let timedOut = false;
   const timer = setTimeout(() => {
     timedOut = true;
-    void reader.cancel('Body inspection timed out');
+    response.close();
   }, timeoutMs);
   const chunks: Uint8Array[] = [];
   let total = 0;
   let truncated = false;
   try {
-    while (total < maxBodyBytes) {
-      const { done, value } = await reader.read();
-      if (done) break;
-      if (!value) continue;
+    for await (const rawChunk of response.body) {
+      const value = typeof rawChunk === 'string' ? new TextEncoder().encode(rawChunk) : rawChunk;
       const remaining = maxBodyBytes - total;
       chunks.push(value.subarray(0, remaining));
       total += Math.min(value.byteLength, remaining);
@@ -90,9 +93,11 @@ async function readBodySample(response: Response, maxBodyBytes: number, timeoutM
         break;
       }
     }
+  } catch (error) {
+    if (timedOut) throw new DOMException('Response body inspection timed out', 'AbortError');
+    throw error;
   } finally {
     clearTimeout(timer);
-    await reader.cancel().catch(() => undefined);
   }
   if (timedOut) throw new DOMException('Response body inspection timed out', 'AbortError');
 
@@ -157,7 +162,7 @@ export async function checkUrl(
 ): Promise<UrlHealthResult> {
   const startedAt = performance.now();
   const checkedAt = (options.now ?? (() => new Date()))().toISOString();
-  const fetchImpl = options.fetch ?? fetch;
+  const transport = options.transport ?? axiosTransport;
   const resolve = options.resolve ?? defaultHostResolver;
   const timeoutMs = options.timeoutMs ?? DEFAULT_TIMEOUT_MS;
   const maxRedirects = options.maxRedirects ?? DEFAULT_MAX_REDIRECTS;
@@ -165,14 +170,8 @@ export async function checkUrl(
   const userAgent = options.userAgent ?? DEFAULT_USER_AGENT;
   const evidence: UrlHealthEvidence[] = [];
 
-  try {
-    await validateUrlTarget(requestedUrl, resolve);
-  } catch (error) {
-    return failureResult(requestedUrl, startedAt, checkedAt, error);
-  }
-
   const request = (method: HttpMethod) => requestWithSafeRedirects(requestedUrl, {
-    fetch: fetchImpl,
+    transport,
     resolve,
     method,
     timeoutMs,
@@ -192,6 +191,7 @@ export async function checkUrl(
     if (error instanceof RedirectError && [
       'unsafe_url',
       'invalid_url',
+      'dns_error',
       'redirect_loop',
       'too_many_redirects',
     ].includes(error.reason)) {
@@ -209,9 +209,10 @@ export async function checkUrl(
     const classification = classifyHttpResponse({
       httpStatus: head.response.status,
       method: 'HEAD',
-      contentType: head.response.headers.get('content-type') ?? undefined,
+      contentType: head.response.headers['content-type'],
       redirectCount: head.redirectCount,
     });
+    head.response.close();
     return buildResult(requestedUrl, startedAt, checkedAt, {
       finalUrl: head.finalUrl,
       status: classification.status,
@@ -228,6 +229,7 @@ export async function checkUrl(
       message: `HEAD returned HTTP ${head.response.status}; attempting GET for confirmation`,
       value: head.response.status,
     });
+    head.response.close();
   }
 
   let get: RedirectResponse;
@@ -258,11 +260,13 @@ export async function checkUrl(
         { type: 'request_error', message: `GET response inspection failed: ${failure.message}`, value: failure.reason },
       ],
     });
+  } finally {
+    get.response.close();
   }
   const classification = classifyHttpResponse({
     httpStatus: get.response.status,
     method: 'GET',
-    contentType: get.response.headers.get('content-type') ?? undefined,
+    contentType: get.response.headers['content-type'],
     bodySample: body.sample,
     redirectCount: get.redirectCount,
   });

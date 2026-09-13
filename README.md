@@ -41,7 +41,10 @@ Deep Dark Matter / Quantum Terminal theme:
 
 ## Develop
 
+Node.js 22.18 or newer is required. The repository's `.nvmrc` pins the baseline development version, and npm rejects installs on unsupported Node releases.
+
 ```bash
+nvm use
 npm install
 npm run dev         # Astro dev server
 node server/server.js   # Express API (port 5000; Node 22.18+)
@@ -54,8 +57,8 @@ npm run build       # static build to dist/
 
 ## Health check
 
-The admin health check uses `src/lib/url-health/` to collect URL observations. It validates DNS and every redirect target against local/private address ranges, tries HEAD first, and confirms inconclusive responses with a size-limited GET. The reusable checker never assigns PhysicURL workflow states.
+The admin health check uses `src/lib/url-health/` to collect URL observations. It validates DNS and every redirect target against local/private address ranges, then gives Axios a custom Node agent that can connect only to those validated addresses. Redirects remain disabled in Axios and are revalidated manually. The checker tries HEAD first and confirms inconclusive responses with a size-limited GET. The reusable checker never assigns PhysicURL workflow states.
 
-`src/lib/resource-health/` applies conservative PhysicURL rules and persists one record per URL in `data/resource_status.json` using atomic file replacement. Records separate `reviewState` (`active`, `under_review`, or `confirmed_broken`) from `lastCheck`. Automated checks may enter or preserve `under_review`, but never assign `confirmed_broken` or automatically clear an existing review decision.
+`src/lib/resource-health/` applies conservative PhysicURL rules and persists one record per URL in `data/resource_status.json` using atomic file replacement. Records separate `reviewState` (`active`, `under_review`, or `confirmed_broken`), the original `reviewConcern`, and the latest `lastCheck`. `consecutiveServerFailures` is used only for repeated temporary 5xx responses. Automated checks may enter or preserve `under_review`, but never assign `confirmed_broken` or automatically clear an existing review decision.
 
 Legacy `dead`, `timeout`, `repurposed`, `details`, and related fields are normalized on read. Their prior review meaning and original JSON values are retained under `legacy`; the next status write atomically stores the normalized structure.

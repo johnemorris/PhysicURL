@@ -235,7 +235,7 @@ app.get('/api/admin/resources', requireAuth, (req, res) => {
   res.json({
     resources: resources.map(resource => ({
       ...resource,
-      health: status[resource.url] ?? { reviewState: 'active', consecutiveFailures: 0 },
+      health: status[resource.url] ?? { reviewState: 'active', consecutiveServerFailures: 0 },
     })),
   });
 });

@@ -1,4 +1,4 @@
-import type { UrlHealthResult } from '../url-health/index.ts';
+import type { UrlHealthReason, UrlHealthResult } from '../url-health/index.ts';
 
 export type ResourceReviewState = 'active' | 'under_review' | 'confirmed_broken';
 
@@ -17,10 +17,17 @@ export interface LegacyResourceStatus {
 export interface ResourceHealthRecord {
   reviewState: ResourceReviewState;
   lastCheck?: UrlHealthResult;
-  consecutiveFailures: number;
-  reviewDetails?: string;
+  reviewConcern?: ResourceReviewConcern;
+  consecutiveServerFailures: number;
   updatedAt?: string;
   legacy?: LegacyResourceStatus;
+}
+
+export interface ResourceReviewConcern {
+  reason: UrlHealthReason;
+  observedAt: string;
+  summary: string;
+  httpStatus?: number;
 }
 
 export type ResourceStatusMap = Record<string, ResourceHealthRecord>;

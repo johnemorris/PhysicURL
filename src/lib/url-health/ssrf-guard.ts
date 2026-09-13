@@ -1,6 +1,7 @@
 import { promises as dns } from 'node:dns';
 import { isIP } from 'node:net';
 import type { HostResolver, ResolvedAddress, UrlHealthReason } from './types.ts';
+import type { ValidatedUrlTarget } from './types.ts';
 
 const BLOCKED_HOSTNAMES = new Set([
   'localhost',
@@ -160,7 +161,7 @@ export function parseHttpUrl(input: string): URL {
 export async function validateUrlTarget(
   input: string | URL,
   resolve: HostResolver = defaultHostResolver,
-): Promise<{ url: URL; addresses: ResolvedAddress[] }> {
+): Promise<ValidatedUrlTarget> {
   const url = typeof input === 'string' ? parseHttpUrl(input) : parseHttpUrl(input.href);
   const hostname = normalizeHostname(url.hostname);
 
@@ -172,7 +173,11 @@ export async function validateUrlTarget(
     if (isUnsafeIpAddress(hostname)) {
       throw new UrlTargetError('unsafe_url', `Blocked local, private, or reserved address: ${hostname}`);
     }
-    return { url, addresses: [{ address: hostname, family: isIP(hostname) as 4 | 6 }] };
+    return {
+      url,
+      hostname,
+      validatedAddresses: [{ address: hostname, family: isIP(hostname) as 4 | 6 }],
+    };
   }
 
   const addresses = await resolve(hostname);
@@ -186,5 +191,5 @@ export async function validateUrlTarget(
       `Hostname ${hostname} resolves to a blocked address (${unsafe.address})`,
     );
   }
-  return { url, addresses };
+  return { url, hostname, validatedAddresses: addresses };
 }

@@ -3,6 +3,7 @@ import type {
   LegacyResourceStatus,
   JsonValue,
   ResourceHealthRecord,
+  ResourceReviewConcern,
   ResourceReviewState,
   ResourceStatusMap,
 } from './types.ts';
@@ -42,6 +43,8 @@ function originalLegacyRecord(record: Record<string, unknown>): Record<string, J
   const excluded = new Set([
     'reviewState',
     'lastCheck',
+    'reviewConcern',
+    'consecutiveServerFailures',
     'consecutiveFailures',
     'reviewDetails',
     'updatedAt',
@@ -100,6 +103,47 @@ function normalizeReviewState(record: Record<string, unknown>): ResourceReviewSt
   // Preserve that review decision unless a legacy record explicitly said it was live.
   const legacyStatus = asString(record.status);
   return legacyStatus === 'live' || legacyStatus === 'active' ? 'active' : 'under_review';
+}
+
+function normalizeReviewConcern(value: unknown): ResourceReviewConcern | undefined {
+  const record = asRecord(value);
+  const reason = asString(record?.reason);
+  const observedAt = asString(record?.observedAt);
+  const summary = asString(record?.summary);
+  if (!reason || !observedAt || !summary) return undefined;
+  return {
+    reason: reason as UrlHealthReason,
+    observedAt,
+    summary,
+    ...(asNumber(record?.httpStatus) !== undefined ? { httpStatus: asNumber(record?.httpStatus) } : {}),
+  };
+}
+
+function concernFromLegacyOrCheck(
+  reviewState: ResourceReviewState,
+  record: Record<string, unknown>,
+  legacy: LegacyResourceStatus,
+  lastCheck: UrlHealthResult | undefined,
+): ResourceReviewConcern | undefined {
+  const stored = normalizeReviewConcern(record.reviewConcern);
+  if (stored) return stored;
+  if (reviewState !== 'under_review' && reviewState !== 'confirmed_broken') return undefined;
+
+  const originalDiagnostic = lastCheck?.status !== 'healthy' ? lastCheck : undefined;
+  const summary = asString(record.reviewDetails)
+    ?? legacy.details
+    ?? (originalDiagnostic?.httpStatus !== undefined
+      ? `Automated check: ${originalDiagnostic.reason.replaceAll('_', ' ')} (HTTP ${originalDiagnostic.httpStatus})`
+      : `Automated check: ${(originalDiagnostic?.reason ?? 'unexpected_response').replaceAll('_', ' ')}`);
+  return {
+    reason: originalDiagnostic?.reason ?? 'unexpected_response',
+    observedAt: legacy.checked
+      ?? originalDiagnostic?.checkedAt
+      ?? asString(record.updatedAt)
+      ?? new Date(0).toISOString(),
+    summary,
+    ...(originalDiagnostic?.httpStatus !== undefined ? { httpStatus: originalDiagnostic.httpStatus } : {}),
+  };
 }
 
 function legacyReason(status: string | undefined, httpStatus: number | undefined): UrlHealthReason {
@@ -183,16 +227,21 @@ export function normalizeResourceHealthRecord(
   const hasLegacy = Object.keys(legacy).length > 0;
   const lastCheck = normalizeLastCheck(record.lastCheck, requestedUrl)
     ?? legacyDiagnostic(requestedUrl, legacy);
-  const reviewDetails = asString(record.reviewDetails) ?? legacy.details;
+  const reviewState = normalizeReviewState(record);
+  const reviewConcern = concernFromLegacyOrCheck(reviewState, record, legacy, lastCheck);
+  const isServerFailure = lastCheck?.reason === 'http_error'
+    && lastCheck.httpStatus !== undefined
+    && lastCheck.httpStatus >= 500;
+  const legacyFailureCount = isServerFailure ? asNumber(record.consecutiveFailures) ?? 1 : 0;
 
   return {
-    reviewState: normalizeReviewState(record),
+    reviewState,
     ...(lastCheck ? { lastCheck } : {}),
-    consecutiveFailures: Math.max(
+    ...(reviewConcern ? { reviewConcern } : {}),
+    consecutiveServerFailures: Math.max(
       0,
-      asNumber(record.consecutiveFailures) ?? (lastCheck && lastCheck.status !== 'healthy' ? 1 : 0),
+      asNumber(record.consecutiveServerFailures) ?? legacyFailureCount,
     ),
-    ...(reviewDetails ? { reviewDetails } : {}),
     ...(asString(record.updatedAt) || lastCheck?.checkedAt
       ? { updatedAt: asString(record.updatedAt) ?? lastCheck?.checkedAt }
       : {}),
@@ -213,7 +262,7 @@ export function isUnderReview(record: ResourceHealthRecord | undefined): boolean
 }
 
 export function reviewDetails(record: ResourceHealthRecord | undefined): string {
-  return record?.reviewDetails
+  return record?.reviewConcern?.summary
     ?? record?.lastCheck?.evidence.find((entry) => entry.type === 'legacy_details')?.message
     ?? 'Under review';
 }

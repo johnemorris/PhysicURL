@@ -7,6 +7,7 @@ export type {
   JsonValue,
   ResourceHealthRecord,
   ResourceHealthStats,
+  ResourceReviewConcern,
   ResourceReviewState,
   ResourceStatusMap,
 } from './types.ts';

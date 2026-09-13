@@ -40,13 +40,31 @@ export interface ResolvedAddress {
 
 export type HostResolver = (hostname: string) => Promise<ResolvedAddress[]>;
 
-export type UrlHealthFetch = (
-  input: string | URL | Request,
-  init?: RequestInit,
-) => Promise<Response>;
+export interface ValidatedUrlTarget {
+  url: URL;
+  hostname: string;
+  validatedAddresses: ResolvedAddress[];
+}
+
+export interface UrlHealthTransportRequest extends ValidatedUrlTarget {
+  method: HttpMethod;
+  timeoutMs: number;
+  userAgent: string;
+}
+
+export interface UrlHealthTransportResponse {
+  status: number;
+  headers: Record<string, string>;
+  body?: AsyncIterable<Uint8Array | string>;
+  close: () => void;
+}
+
+export type UrlHealthTransport = (
+  request: UrlHealthTransportRequest,
+) => Promise<UrlHealthTransportResponse>;
 
 export interface UrlHealthOptions {
-  fetch?: UrlHealthFetch;
+  transport?: UrlHealthTransport;
   resolve?: HostResolver;
   timeoutMs?: number;
   maxRedirects?: number;
