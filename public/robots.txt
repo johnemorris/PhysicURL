@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://physicurl.com/sitemap-index.xml
+
