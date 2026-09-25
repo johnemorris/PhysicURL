@@ -3,7 +3,7 @@ import { mkdirSync, readFileSync, renameSync, unlinkSync, writeFileSync } from '
 import { dirname } from 'node:path';
 import type { UrlHealthResult } from '../url-health/index.ts';
 import { normalizeResourceStatusMap } from './normalize-status.ts';
-import type { ResourceHealthStats, ResourceStatusMap } from './types.ts';
+import type { ResourceHealthStats, ResourceReviewState, ResourceStatusMap } from './types.ts';
 import { applyDiagnosticToResource } from './workflow.ts';
 
 const writeQueues = new Map<string, Promise<void>>();
@@ -61,6 +61,42 @@ export async function persistDiagnostics(
       rejectResult(error);
     });
 
+  writeQueues.set(file, nextWrite);
+  void nextWrite.finally(() => {
+    if (writeQueues.get(file) === nextWrite) writeQueues.delete(file);
+  });
+  return resultPromise;
+}
+
+export async function setResourceReviewState(
+  file: string,
+  resourceUrl: string,
+  reviewState: ResourceReviewState,
+): Promise<ResourceStatusMap> {
+  const priorWrite = writeQueues.get(file) ?? Promise.resolve();
+  let resolveResult: (value: ResourceStatusMap) => void;
+  let rejectResult: (reason: unknown) => void;
+  const resultPromise = new Promise<ResourceStatusMap>((resolve, reject) => {
+    resolveResult = resolve;
+    rejectResult = reject;
+  });
+  const nextWrite = priorWrite
+    .catch(() => undefined)
+    .then(() => {
+      const current = loadResourceStatusFile(file);
+      const previous = current[resourceUrl];
+      current[resourceUrl] = {
+        reviewState,
+        ...(previous?.lastCheck ? { lastCheck: previous.lastCheck } : {}),
+        ...(previous?.reviewConcern ? { reviewConcern: previous.reviewConcern } : {}),
+        consecutiveServerFailures: previous?.consecutiveServerFailures ?? 0,
+        updatedAt: new Date().toISOString(),
+        ...(previous?.legacy ? { legacy: previous.legacy } : {}),
+      };
+      writeResourceStatusFileAtomic(file, current);
+      resolveResult(current);
+    })
+    .catch((error: unknown) => rejectResult(error));
   writeQueues.set(file, nextWrite);
   void nextWrite.finally(() => {
     if (writeQueues.get(file) === nextWrite) writeQueues.delete(file);

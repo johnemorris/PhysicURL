@@ -3,6 +3,7 @@ import { compile } from 'sass';
 import { readFileSync } from 'fs';
 import { join } from 'path';
 import SubmitModal from '../components/SubmitModal.jsx';
+import { AMAZON_ASSOCIATE_DISCLOSURE } from '../lib/referral.ts';
 
 // Compile SCSS at build time — single source, no duplicates
 const scssPath = join(process.cwd(), 'src', 'styles', 'global.scss');
@@ -146,7 +147,7 @@ const jsonLd = {
           <a href="#" class="btn btn-primary" style="font-size:12px;padding:4px 12px;">+ Submit a Link</a> |
           <a href="/admin/">Admin</a>
         </p>
-        <p class="affiliate-disclaimer">PhysicURL is a participant in the Amazon Associates Program. Links marked as affiliate may earn a commission on qualifying purchases at no extra cost to you. All affiliate links are disclosed with an "Affiliate" badge.</p>
+        <p class="affiliate-disclaimer">{AMAZON_ASSOCIATE_DISCLOSURE} Amazon affiliate links are marked with an "Affiliate" badge.</p>
       </footer>
     </main>
   </div>

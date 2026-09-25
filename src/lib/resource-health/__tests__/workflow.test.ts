@@ -6,7 +6,7 @@ import test from 'node:test';
 import type { UrlHealthResult } from '../../url-health/index.ts';
 import { checkResources } from '../check-resources.ts';
 import { normalizeResourceStatusMap } from '../normalize-status.ts';
-import { getResourceHealthStats, persistDiagnostics } from '../status-store.ts';
+import { getResourceHealthStats, persistDiagnostics, setResourceReviewState } from '../status-store.ts';
 import { applyDiagnosticToResource } from '../workflow.ts';
 
 function diagnostic(overrides: Partial<UrlHealthResult> = {}): UrlHealthResult {
@@ -281,4 +281,21 @@ test('concurrent persistence updates are serialized and atomically retained', as
   const stored = JSON.parse(readFileSync(file, 'utf8')) as Record<string, unknown>;
   assert.deepEqual(Object.keys(stored).sort(), ['https://one.example/', 'https://two.example/']);
   assert.equal((stored['https://two.example/'] as { reviewState: string }).reviewState, 'under_review');
+});
+
+test('manual reactivation preserves diagnostic history while changing workflow state', async (t) => {
+  const directory = mkdtempSync(join(tmpdir(), 'physicurl-review-state-'));
+  t.after(() => rmSync(directory, { recursive: true, force: true }));
+  const file = join(directory, 'resource_status.json');
+  await persistDiagnostics(file, [diagnostic({
+    requestedUrl: 'https://example.com/',
+    status: 'suspicious',
+    reason: 'http_error',
+    httpStatus: 404,
+  })]);
+
+  const status = await setResourceReviewState(file, 'https://example.com/', 'active');
+  assert.equal(status['https://example.com/'].reviewState, 'active');
+  assert.equal(status['https://example.com/'].reviewConcern?.httpStatus, 404);
+  assert.equal(status['https://example.com/'].lastCheck?.httpStatus, 404);
 });

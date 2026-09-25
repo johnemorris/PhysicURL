@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import { QUESTIONS, CATALOG, computeKit, kitTotal } from '../lib/astroWizard.js';
-import { addReferralParams } from '../lib/referral.ts';
+import { buildProductPurchaseUrl } from '../lib/referral.ts';
 import AstroObservationDeck from './AstroObservationDeck.jsx';
 import WizardIntro from './shared/WizardIntro.jsx';
 import WizardQuestionFlow from './shared/WizardQuestionFlow.jsx';
@@ -22,6 +22,7 @@ export default function AstroWizard() {
 
   const kit = useMemo(() => computeKit(answers), [answers]);
   const total = useMemo(() => kitTotal(kit), [kit]);
+  const vendorDestination = buildProductPurchaseUrl(vendorLink(kit.vendor));
   const complete = answers.target && answers.environment && answers.experience && answers.budget;
 
   const onAnswer = (qid, oid) => {
@@ -99,9 +100,11 @@ export default function AstroWizard() {
               <div className="bundle-sub">{kit.vendor} — cards above deep-link into each product on this marketplace.</div>
             </div>
             <div className="bundle-price">${total.toLocaleString()}</div>
-            <a href={addReferralParams(vendorLink(kit.vendor))} target="_blank" rel="noopener nofollow sponsored" className="btn-primary">
-              Open {kit.vendor} &rarr;
-            </a>
+            {vendorDestination && (
+              <a href={vendorDestination} target="_blank" rel="noopener nofollow sponsored" className="btn-primary" data-placement="wizard-vendor">
+                Open {kit.vendor} &rarr;
+              </a>
+            )}
           </div>
         </WizardChecklist>
       )}

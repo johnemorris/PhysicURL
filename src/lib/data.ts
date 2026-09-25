@@ -68,6 +68,16 @@ export function slugify(name: string): string {
   return name.toLowerCase().replace(' & ', '-').replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
 }
 
+const NEW_RESOURCE_WINDOW_MS = 30 * 24 * 60 * 60 * 1000;
+
+export function isNewResource(addedDate: string | undefined, now = new Date()): boolean {
+  if (!addedDate) return false;
+  const addedAt = new Date(`${addedDate}T00:00:00.000Z`).getTime();
+  if (!Number.isFinite(addedAt)) return false;
+  const ageMs = now.getTime() - addedAt;
+  return ageMs >= 0 && ageMs < NEW_RESOURCE_WINDOW_MS;
+}
+
 export function groupByScience(resources: Resource[]): Record<string, Resource[]> {
   const map: Record<string, Resource[]> = {};
   for (const r of resources) {

@@ -19,13 +19,17 @@ interface Props {
 }
 
 import { addReferralParams, isAffiliateUrl } from '../lib/referral.ts';
+import { isNewResource } from '../lib/data.ts';
 
 const { resource, accessLabels = {} } = Astro.props;
-const { title, url, domain, description, tags, access, resourceType, isVerified, isAffiliate, rating, subdiscipline, isUnderReview, reviewDetails } = resource;
+const { title, url, domain, description, tags, access, resourceType, isVerified, isAffiliate, rating, subdiscipline, addedDate, isUnderReview, reviewDetails } = resource;
 
-// Add referral parameters for affiliate/merchant URLs
-const finalUrl = isAffiliate || isAffiliateUrl(url) ? addReferralParams(url) : url;
-const relAttr = isAffiliate || isAffiliateUrl(finalUrl) ? 'noopener nofollow sponsored' : 'noopener';
+// Add the configured Associates tag only to eligible Amazon URLs.
+const isAmazonAffiliateLink = isAffiliateUrl(url);
+const hasAffiliateLink = Boolean(isAffiliate) || isAmazonAffiliateLink;
+const finalUrl = isAmazonAffiliateLink ? addReferralParams(url) : url;
+const relAttr = hasAffiliateLink ? 'noopener nofollow sponsored' : 'noopener';
+const isNew = isNewResource(addedDate);
 ---
 
 <div class={`resource-row ${isUnderReview ? 'under-review' : ''}`}
@@ -41,8 +45,9 @@ const relAttr = isAffiliate || isAffiliateUrl(finalUrl) ? 'noopener nofollow spo
   <div class="resource-title-line">
     <a href={finalUrl} target="_blank" rel={relAttr} class={`resource-title ${isUnderReview ? 'disabled-link' : ''}`}>{title}</a>
     {isVerified && <span class="verified-badge">✓ Verified</span>}
+    {isNew && <span class="new-badge">New</span>}
     {isUnderReview && <span class="review-badge" title={reviewDetails || 'Under review'}>⚠ Under Review</span>}
-    {isAffiliate && <span class="affiliate-badge">Affiliate</span>}
+    {hasAffiliateLink && <span class="affiliate-badge">Affiliate</span>}
     <span class="resource-domain">{domain}</span>
   </div>
   <div class="resource-description">{description}</div>

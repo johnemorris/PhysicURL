@@ -1,3 +1,5 @@
+import { AMAZON_ASSOCIATE_DISCLOSURE } from '../../lib/referral.ts';
+
 /**
  * WizardChecklist
  *
@@ -29,7 +31,7 @@ export default function WizardChecklist({ title, description, banners, children 
       {children}
 
       <div className="checklist-legal">
-        As part of helping you build your kit, some of the links provided above are affiliate links. If you make a purchase through them, we may earn a small commission at no additional cost to you.
+        {AMAZON_ASSOCIATE_DISCLOSURE} Affiliate links do not affect which products are recommended.
       </div>
     </div>
   );

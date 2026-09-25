@@ -1,212 +1,47 @@
-export const REFERRAL_TAGS: Record<string, string> = {
-  amazon: 'physicurl-20',
-  highpointscientific: 'physicurl',
-  agenaastro: 'physicurl',
-  bhphotovideo: 'physicurl',
-  adafruit: 'physicurl',
-  sparkfun: 'physicurl',
-  digikey: 'physicurl',
-  mouser: 'physicurl',
-  newark: 'physicurl',
-  thorlabs: 'physicurl',
-  edmundoptics: 'physicurl',
-  oceanoptics: 'physicurl',
-  hamamatsu: 'physicurl',
-  newport: 'physicurl',
-  zygo: 'physicurl',
-  keysight: 'physicurl',
-  tektronix: 'physicurl',
-  rigol: 'physicurl',
-  siglent: 'physicurl',
-  owon: 'physicurl',
-  hantek: 'physicurl',
-  fluke: 'physicurl',
-  keithley: 'physicurl',
-  agilent: 'physicurl',
-  hp: 'physicurl',
-  'ni.com': 'physicurl',
-  'mathworks.com': 'physicurl',
-  'wolfram.com': 'physicurl',
-  'maplesoft.com': 'physicurl',
-  'sagemath.org': 'physicurl',
-  'julialang.org': 'physicurl',
-  'python.org': 'physicurl',
-  'anaconda.com': 'physicurl',
-  'conda.io': 'physicurl',
-  'pypi.org': 'physicurl',
-  'npmjs.com': 'physicurl',
-  'github.com': 'physicurl',
-  'gitlab.com': 'physicurl',
-  'bitbucket.org': 'physicurl',
-  'docker.com': 'physicurl',
-  'kubernetes.io': 'physicurl',
-  'aws.amazon.com': 'physicurl',
-  'cloud.google.com': 'physicurl',
-  'azure.microsoft.com': 'physicurl',
-  'digitalocean.com': 'physicurl',
-  'linode.com': 'physicurl',
-  'vultr.com': 'physicurl',
-  'hetzner.com': 'physicurl',
-  'scaleway.com': 'physicurl',
-  'ovh.com': 'physicurl',
-  'contabo.com': 'physicurl',
-  'ionos.com': 'physicurl',
-  'godaddy.com': 'physicurl',
-  'namecheap.com': 'physicurl',
-  'cloudflare.com': 'physicurl',
-  'fastly.com': 'physicurl',
-  'vercel.com': 'physicurl',
-  'netlify.com': 'physicurl',
-  'heroku.com': 'physicurl',
-  'render.com': 'physicurl',
-  'railway.app': 'physicurl',
-  'fly.io': 'physicurl',
-  'planetscale.com': 'physicurl',
-  'supabase.com': 'physicurl',
-  'firebase.google.com': 'physicurl',
-  'mongodb.com': 'physicurl',
-  'redis.com': 'physicurl',
-  'elastic.co': 'physicurl',
-  'confluent.io': 'physicurl',
-  'databricks.com': 'physicurl',
-  'snowflake.com': 'physicurl',
-  'clickhouse.com': 'physicurl',
-  'timescale.com': 'physicurl',
-  'influxdata.com': 'physicurl',
-  'grafana.com': 'physicurl',
-  'prometheus.io': 'physicurl',
-  'jaegertracing.io': 'physicurl',
-  'zipkin.io': 'physicurl',
-  'opentelemetry.io': 'physicurl',
-  'sentry.io': 'physicurl',
-  'rollbar.com': 'physicurl',
-  'bugsnag.com': 'physicurl',
-  'airbrake.io': 'physicurl',
-  'honeybadger.io': 'physicurl',
-  'appsignal.com': 'physicurl',
-  'skylight.io': 'physicurl',
-  'newrelic.com': 'physicurl',
-  'datadoghq.com': 'physicurl',
-  'signoz.io': 'physicurl',
-  'highlight.io': 'physicurl',
-  'logrocket.com': 'physicurl',
-  'fullstory.com': 'physicurl',
-  'amplitude.com': 'physicurl',
-  'mixpanel.com': 'physicurl',
-  'heap.io': 'physicurl',
-  'posthog.com': 'physicurl',
-  'plausible.io': 'physicurl',
-  'fathom.dev': 'physicurl',
-  'umami.is': 'physicurl',
-  'matomo.org': 'physicurl',
-  'goatcounter.com': 'physicurl',
-  'ackee.io': 'physicurl',
-  'shynet.github.io': 'physicurl',
-  'cabin.sh': 'physicurl',
-  'simpleanalytics.com': 'physicurl',
-  'counter.dev': 'physicurl',
-  'hitcounter.io': 'physicurl',
-  'statcounter.com': 'physicurl',
-  'clicky.com': 'physicurl',
-  'woopra.com': 'physicurl',
-  'kissmetrics.io': 'physicurl',
-  'intercom.io': 'physicurl',
-  'drift.com': 'physicurl',
-  'crisp.chat': 'physicurl',
-  'tawk.to': 'physicurl',
-  'zendesk.com': 'physicurl',
-  'freshdesk.com': 'physicurl',
-  'helpscout.com': 'physicurl',
-  'gorgias.com': 'physicurl',
-  'frontapp.com': 'physicurl',
-  'missiveapp.com': 'physicurl',
-  'missive.com': 'physicurl',
-  'linear.app': 'physicurl',
-  'notion.so': 'physicurl',
-  'slack.com': 'physicurl',
-  'discord.com': 'physicurl',
-  'microsoft.com': 'physicurl',
-  'google.com': 'physicurl',
-  'apple.com': 'physicurl',
-  'meta.com': 'physicurl',
-  'netflix.com': 'physicurl',
-  'spotify.com': 'physicurl',
-  'youtube.com': 'physicurl',
-  'twitch.tv': 'physicurl',
-  'tiktok.com': 'physicurl',
-  'instagram.com': 'physicurl',
-  'facebook.com': 'physicurl',
-  'twitter.com': 'physicurl',
-  'x.com': 'physicurl',
-  'linkedin.com': 'physicurl',
-  'stackoverflow.com': 'physicurl',
-  'stackexchange.com': 'physicurl',
-  'reddit.com': 'physicurl',
-  'hackernews.com': 'physicurl',
-  'ycombinator.com': 'physicurl',
-  'techcrunch.com': 'physicurl',
-  'theverge.com': 'physicurl',
-  'wired.com': 'physicurl',
-  'arstechnica.com': 'physicurl',
-  'engadget.com': 'physicurl',
-  'gizmodo.com': 'physicurl',
-  'cnet.com': 'physicurl',
-  'zdnet.com': 'physicurl',
-  'tomshardware.com': 'physicurl',
-  'anandtech.com': 'physicurl',
-  'pcmag.com': 'physicurl',
-  'techradar.com': 'physicurl',
-  'digitaltrends.com': 'physicurl',
-  'androidauthority.com': 'physicurl',
-  'androidpolice.com': 'physicurl',
-  '9to5google.com': 'physicurl',
-  '9to5mac.com': 'physicurl',
-  'macrumors.com': 'physicurl',
-  'iphonehacks.com': 'physicurl',
-  'iphoneincanada.ca': 'physicurl',
-  'iphoneinusa.com': 'physicurl',
-  'androidcentral.com': 'physicurl',
-  'androidheadlines.com': 'physicurl',
-  'xda-developers.com': 'physicurl',
-  'gsmarena.com': 'physicurl',
-  'phonearena.com': 'physicurl',
-};
+export const AMAZON_ASSOCIATE_TAG = 'jem02e-20';
 
-export function addReferralParams(url: string): string {
+export const AMAZON_ASSOCIATE_DISCLOSURE = 'As an Amazon Associate I earn from qualifying purchases.';
+
+const AMAZON_RETAIL_HOSTS = new Set(['amazon.com', 'www.amazon.com']);
+
+function parseHttpUrl(value: string): URL | undefined {
   try {
-    const parsed = new URL(url);
-    const hostname = parsed.hostname.replace('www.', '');
-    const tag = REFERRAL_TAGS[hostname];
-    
-    if (tag) {
-      // Add affiliate/ref parameter based on known merchant patterns
-      if (hostname.includes('amazon')) {
-        parsed.searchParams.set('tag', tag);
-      } else if (hostname.includes('highpointscientific') || hostname.includes('agenaastro')) {
-        parsed.searchParams.set('ref', tag);
-      } else if (hostname.includes('bhphotovideo')) {
-        parsed.searchParams.set('utm_source', 'physicurl');
-        parsed.searchParams.set('utm_medium', 'affiliate');
-        parsed.searchParams.set('utm_campaign', tag);
-      } else {
-        parsed.searchParams.set('ref', tag);
-        parsed.searchParams.set('utm_source', 'physicurl');
-        parsed.searchParams.set('utm_medium', 'affiliate');
-      }
-    }
-    
-    return parsed.toString();
+    const url = new URL(value);
+    return url.protocol === 'http:' || url.protocol === 'https:' ? url : undefined;
   } catch {
-    return url;
+    return undefined;
   }
 }
 
+export function isAmazonUrl(value: string): boolean {
+  const url = parseHttpUrl(value);
+  return url !== undefined && AMAZON_RETAIL_HOSTS.has(url.hostname.toLowerCase());
+}
+
+/**
+ * Adds the configured Associates tag only to recognized Amazon retail URLs.
+ * Non-Amazon and malformed inputs are returned unchanged.
+ */
+export function buildAmazonAffiliateUrl(productUrl: string): string {
+  const url = parseHttpUrl(productUrl);
+  if (!url || !AMAZON_RETAIL_HOSTS.has(url.hostname.toLowerCase())) return productUrl;
+  url.searchParams.set('tag', AMAZON_ASSOCIATE_TAG);
+  return url.toString();
+}
+
+/** Returns a safe product destination, or undefined when the inventory URL is unusable. */
+export function buildProductPurchaseUrl(productUrl: string | undefined): string | undefined {
+  if (!productUrl) return undefined;
+  const url = parseHttpUrl(productUrl);
+  if (!url) return undefined;
+  return isAmazonUrl(url.href) ? buildAmazonAffiliateUrl(url.href) : url.href;
+}
+
+// Backward-compatible name used by existing resource rows.
+export function addReferralParams(url: string): string {
+  return buildAmazonAffiliateUrl(url);
+}
+
 export function isAffiliateUrl(url: string): boolean {
-  try {
-    const parsed = new URL(url);
-    const hostname = parsed.hostname.replace('www.', '');
-    return hostname in REFERRAL_TAGS;
-  } catch {
-    return false;
-  }
+  return isAmazonUrl(url);
 }

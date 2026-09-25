@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { CATALOG, kitTotal, itemCount } from '../lib/astroWizard.js';
+import { AMAZON_ASSOCIATE_DISCLOSURE } from '../lib/referral.ts';
 
 // Live Observation Deck: refined animated night-sky preview + reactive inventory.
 export default function AstroObservationDeck({ answers, kit }) {
@@ -317,7 +318,7 @@ export default function AstroObservationDeck({ answers, kit }) {
       </div>
 
       <div className="obs-disclosure">
-        Some links are affiliate links. If you buy through them, we may earn a small commission at no extra cost to you.
+        {AMAZON_ASSOCIATE_DISCLOSURE}
       </div>
     </div>
   );

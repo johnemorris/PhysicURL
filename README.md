@@ -51,9 +51,11 @@ node server/server.js   # Express API (port 5000; Node 22.18+)
 npm run build       # static build to dist/
 ```
 
+When the static site and API use different production origins, set `PUBLIC_API_URL` for the build and add that exact frontend origin to the API's comma-separated `PHYSICURL_ALLOWED_ORIGINS` setting. Localhost origins are accepted automatically outside production.
+
 ## Admin
 
-`/admin.html` — default password via `ADMIN_PASSWORD` env var (`physicurl-admin` fallback).
+`/admin.html` — requires the `ADMIN_PASSWORD` environment variable; the API exits at startup when it is missing.
 
 ## Health check
 
@@ -62,3 +64,9 @@ The admin health check uses `src/lib/url-health/` to collect URL observations. I
 `src/lib/resource-health/` applies conservative PhysicURL rules and persists one record per URL in `data/resource_status.json` using atomic file replacement. Records separate `reviewState` (`active`, `under_review`, or `confirmed_broken`), the original `reviewConcern`, and the latest `lastCheck`. `consecutiveServerFailures` is used only for repeated temporary 5xx responses. Automated checks may enter or preserve `under_review`, but never assign `confirmed_broken` or automatically clear an existing review decision.
 
 Legacy `dead`, `timeout`, `repurposed`, `details`, and related fields are normalized on read. Their prior review meaning and original JSON values are retained under `legacy`; the next status write atomically stores the normalized structure.
+
+## Affiliate links and bulk import
+
+Amazon product links are tagged centrally in `src/lib/referral.ts` with Associates ID `jem02e-20`; wizard selection logic remains independent of affiliate handling.
+
+Bulk imports use a validate-and-preview step before explicit approval. The server derives IDs, dates, domains, and affiliate state, rejects duplicates or unknown taxonomy, and atomically replaces the resource JSON file only after the complete batch passes validation.

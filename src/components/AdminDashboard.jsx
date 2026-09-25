@@ -34,6 +34,18 @@ function ReviewStatusSummary({ reviewState, reviewConcern, lastCheck }) {
   );
 }
 
+function emptyResourceForm() {
+  return {
+    title: '',
+    url: '',
+    description: '',
+    science: '',
+    subdiscipline: '',
+    resourceType: 'reference',
+    access: 'free',
+  };
+}
+
 export default function AdminDashboard() {
   const [token, setToken] = useState(null);
   const [password, setPassword] = useState('');
@@ -46,6 +58,10 @@ export default function AdminDashboard() {
   const [busy, setBusy] = useState(false);
   const [bulkText, setBulkText] = useState('');
   const [bulkMsg, setBulkMsg] = useState('');
+  const [bulkPreview, setBulkPreview] = useState(null);
+  const [creating, setCreating] = useState(false);
+  const [createForm, setCreateForm] = useState(emptyResourceForm);
+  const [createMsg, setCreateMsg] = useState('');
   const [editingIdx, setEditingIdx] = useState(-1);
   const [editForm, setEditForm] = useState(null);
   const [csrfToken, setCsrfToken] = useState('');
@@ -67,6 +83,9 @@ export default function AdminDashboard() {
     if (csrfToken) {
       headers['x-csrf-token'] = csrfToken;
     }
+    if (token && token !== 'cookie') {
+      headers['x-admin-token'] = token;
+    }
     const r = await fetch(`${API}${path}`, { ...opts, headers, credentials: 'include' });
     if (r.status === 401) {
       logout();
@@ -76,7 +95,9 @@ export default function AdminDashboard() {
       await fetchCsrfToken();
       throw new Error('CSRF token expired, retrying...');
     }
-    return r.json();
+    const payload = await r.json().catch(() => ({ error: 'Invalid server response' }));
+    if (!r.ok) throw new Error(payload.error || `Request failed (${r.status})`);
+    return payload;
   };
 
   const login = async (e) => {
@@ -100,7 +121,8 @@ export default function AdminDashboard() {
 
   const logout = async () => {
     try {
-      await fetch(`${API}/api/admin/logout`, { method: 'POST', credentials: 'include' });
+      const headers = token && token !== 'cookie' ? { 'x-admin-token': token } : undefined;
+      await fetch(`${API}/api/admin/logout`, { method: 'POST', headers, credentials: 'include' });
     } catch {}
     setToken(null);
     setCsrfToken('');
@@ -157,21 +179,45 @@ export default function AdminDashboard() {
     }
   };
 
-  const runBulk = async () => {
+  const previewBulk = async () => {
     setBulkMsg('');
+    setBulkPreview(null);
     try {
-      const items = JSON.parse(bulkText);
-      if (!Array.isArray(items)) throw new Error('must be a JSON array');
       setBusy(true);
-      const j = await authFetch('/api/admin/bulk-import', { method: 'POST', body: { items } });
-      setBulkMsg(`Added ${j.added} resources.`);
+      const result = await authFetch('/api/admin/bulk-import/preview', { method: 'POST', body: { raw: bulkText } });
+      setBulkPreview(result.preview);
+      setBulkMsg(result.preview.canImport
+        ? `${result.preview.ready} resources are ready for approval.`
+        : `Resolve ${result.preview.invalid} invalid or duplicate rows before importing.`);
+    } catch (err) {
+      setBulkMsg('Error: ' + err.message);
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const approveBulk = async () => {
+    if (!bulkPreview?.canImport) return;
+    setBusy(true);
+    try {
+      const result = await authFetch('/api/admin/bulk-import', { method: 'POST', body: { items: bulkPreview.items } });
+      setBulkMsg(`Added ${result.added} resources.`);
       setBulkText('');
+      setBulkPreview(null);
       await loadStats();
     } catch (err) {
       setBulkMsg('Error: ' + err.message);
     } finally {
       setBusy(false);
     }
+  };
+
+  const loadBulkFile = async (event) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    setBulkText(await file.text());
+    setBulkPreview(null);
+    setBulkMsg('');
   };
 
   const runHealth = async () => {
@@ -188,7 +234,40 @@ export default function AdminDashboard() {
 
   const startEdit = (idx) => {
     setEditingIdx(idx);
-    setEditForm({ ...resources[idx] });
+    const resource = resources[idx];
+    setEditForm({
+      ...resource,
+      title: resource.title || resource.name || '',
+      isVerified: resource.isVerified ?? resource.verified ?? false,
+    });
+  };
+
+  const createResource = async (event) => {
+    event.preventDefault();
+    setBusy(true);
+    setCreateMsg('');
+    try {
+      await authFetch('/api/admin/resources', { method: 'POST', body: createForm });
+      setCreateForm(emptyResourceForm());
+      setCreating(false);
+      await loadResources();
+      await loadStats();
+    } catch (error) {
+      setCreateMsg(`Error: ${error.message}`);
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const setReviewState = async (idx, reviewState) => {
+    setBusy(true);
+    try {
+      await authFetch(`/api/admin/resources/${idx}/review-state`, { method: 'POST', body: { reviewState } });
+      await loadResources();
+      await loadStats();
+    } finally {
+      setBusy(false);
+    }
   };
 
   const saveEdit = async () => {
@@ -260,7 +339,7 @@ export default function AdminDashboard() {
             <div key={s.id} className={`admin-row status-${s.status}`}>
               <div>
                 <div className="row-title">{s.name} <span className="status-pill">{s.status}</span></div>
-                <div className="row-meta">{s.science} · {s.subdiscipline} · <a href={s.url} target="_blank">{s.url}</a></div>
+                <div className="row-meta">{s.science} · {s.subdiscipline} · <a href={s.url} target="_blank" rel="noopener">{s.url}</a></div>
                 {s.description && <div className="row-desc">{s.description}</div>}
                 <div className="row-meta">Submitted {new Date(s.submitted_at).toLocaleDateString()} {s.submitter_email && `· ${s.submitter_email}`}</div>
               </div>
@@ -277,17 +356,59 @@ export default function AdminDashboard() {
 
       {tab === 'resources' && (
         <div className="admin-panel">
-          <h3>Resources ({resources.length})</h3>
+          <div className="resource-panel-heading">
+            <h3>Resources ({resources.length})</h3>
+            <button
+              className="btn-primary"
+              onClick={() => { setCreating(!creating); setCreateMsg(''); }}
+              disabled={busy}
+            >
+              {creating ? 'Cancel' : 'Add resource'}
+            </button>
+          </div>
+          {creating && (
+            <form className="resource-create-form" onSubmit={createResource}>
+              <label>Title<input required value={createForm.title} onChange={event => setCreateForm({ ...createForm, title: event.target.value })} /></label>
+              <label>URL<input required type="url" value={createForm.url} onChange={event => setCreateForm({ ...createForm, url: event.target.value })} /></label>
+              <label>Science
+                <select required value={createForm.science} onChange={event => setCreateForm({ ...createForm, science: event.target.value, subdiscipline: '' })}>
+                  <option value="">Select science</option>
+                  {[...new Set(resources.map(resource => resource.science))].sort().map(science => <option key={science} value={science}>{science}</option>)}
+                </select>
+              </label>
+              <label>Subdiscipline
+                <select required value={createForm.subdiscipline} onChange={event => setCreateForm({ ...createForm, subdiscipline: event.target.value })} disabled={!createForm.science}>
+                  <option value="">Select subdiscipline</option>
+                  {[...new Set(resources.filter(resource => resource.science === createForm.science).map(resource => resource.subdiscipline))].sort().map(subdiscipline => <option key={subdiscipline} value={subdiscipline}>{subdiscipline}</option>)}
+                </select>
+              </label>
+              <label>Resource type
+                <select value={createForm.resourceType} onChange={event => setCreateForm({ ...createForm, resourceType: event.target.value })}>
+                  {[...new Set(resources.map(resource => resource.resourceType || resource.resource_type))].filter(Boolean).sort().map(resourceType => <option key={resourceType} value={resourceType}>{resourceType}</option>)}
+                </select>
+              </label>
+              <label>Access
+                <select value={createForm.access} onChange={event => setCreateForm({ ...createForm, access: event.target.value })}>
+                  {[...new Set(resources.map(resource => resource.access))].filter(Boolean).sort().map(access => <option key={access} value={access}>{access}</option>)}
+                </select>
+              </label>
+              <label className="resource-create-description">Description<textarea value={createForm.description} onChange={event => setCreateForm({ ...createForm, description: event.target.value })} /></label>
+              <div className="row-actions resource-create-actions">
+                <button type="submit" className="btn-primary" disabled={busy}>Create resource</button>
+              </div>
+              {createMsg && <div className="modal-msg resource-create-message">{createMsg}</div>}
+            </form>
+          )}
           <div className="resources-table">
             {resources.slice(0, 100).map((r, i) => (
               <div key={i} className="admin-row">
                 {editingIdx === i ? (
                   <div style={{ flex: 1 }}>
-                    <input value={editForm.name} onChange={e => setEditForm({ ...editForm, name: e.target.value })} placeholder="Name" />
+                    <input value={editForm.title} onChange={e => setEditForm({ ...editForm, title: e.target.value })} placeholder="Title" />
                     <input value={editForm.url} onChange={e => setEditForm({ ...editForm, url: e.target.value })} placeholder="URL" />
                     <textarea value={editForm.description} onChange={e => setEditForm({ ...editForm, description: e.target.value })} placeholder="Description" />
                     <label style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                      <input type="checkbox" checked={!!editForm.verified} onChange={e => setEditForm({ ...editForm, verified: e.target.checked })} /> Verified
+                      <input type="checkbox" checked={!!editForm.isVerified} onChange={e => setEditForm({ ...editForm, isVerified: e.target.checked })} /> Verified
                     </label>
                     <div className="row-actions">
                       <button onClick={saveEdit} disabled={busy} className="btn-primary">Save</button>
@@ -298,15 +419,15 @@ export default function AdminDashboard() {
                   <>
                     <div>
                       <div className="row-title">
-                        {r.name}
-                        {r.verified && <span className="status-pill verified">✓</span>}
+                        {r.title || r.name}
+                        {(r.isVerified ?? r.verified) && <span className="status-pill verified">✓</span>}
                         {r.health?.reviewState && r.health.reviewState !== 'active' && (
                           <span className={`status-pill health-${r.health.reviewState}`}>
                             {r.health.reviewState.replaceAll('_', ' ')}
                           </span>
                         )}
                       </div>
-                      <div className="row-meta">{r.science} · {r.subdiscipline} · <a href={r.url} target="_blank">{r.url}</a></div>
+                      <div className="row-meta">{r.science} · {r.subdiscipline} · <a href={r.url} target="_blank" rel="noopener">{r.url}</a></div>
                       {r.health?.reviewState === 'under_review' ? (
                         <ReviewStatusSummary
                           reviewState={r.health.reviewState}
@@ -321,6 +442,9 @@ export default function AdminDashboard() {
                       )}
                     </div>
                     <div className="row-actions">
+                      {r.health?.reviewState && r.health.reviewState !== 'active' && (
+                        <button disabled={busy} onClick={() => setReviewState(i, 'active')} className="btn-primary">Reactivate</button>
+                      )}
                       <button onClick={() => startEdit(i)} className="btn-secondary">Edit</button>
                       <button onClick={() => deleteResource(i)} className="btn-danger">Delete</button>
                     </div>
@@ -336,18 +460,33 @@ export default function AdminDashboard() {
       {tab === 'bulk-import' && (
         <div className="admin-panel">
           <h3>Bulk Import</h3>
-          <p style={{ color: 'var(--color-text-muted)', fontSize: 13 }}>Paste a JSON array. Required fields per item: <code>name</code>, <code>url</code>, <code>science</code>.</p>
+          <p className="bulk-import-help">Upload or paste a JSON array. Required fields: <code>title</code> (or <code>name</code>), <code>url</code>, <code>science</code>, and <code>subdiscipline</code>.</p>
+          <input className="bulk-file-input" type="file" accept="application/json,.json" onChange={loadBulkFile} />
           <textarea
             rows="14"
             value={bulkText}
-            onChange={e => setBulkText(e.target.value)}
+            onChange={e => { setBulkText(e.target.value); setBulkPreview(null); setBulkMsg(''); }}
             placeholder='[{"name":"Example","url":"https://example.com","description":"...","science":"Physics","subdiscipline":"Quantum Mechanics","access":"open","resource_type":"reference","tags":["quantum"],"verified":false}]'
-            style={{ width: '100%', fontFamily: 'var(--font-mono)', fontSize: 12 }}
+            className="bulk-json-input"
           />
           <div className="row-actions">
-            <button onClick={runBulk} disabled={busy || !bulkText} className="btn-primary">Import</button>
+            <button onClick={previewBulk} disabled={busy || !bulkText} className="btn-secondary">Preview and validate</button>
+            <button onClick={approveBulk} disabled={busy || !bulkPreview?.canImport} className="btn-primary">
+              Approve import{bulkPreview?.canImport ? ` (${bulkPreview.ready})` : ''}
+            </button>
           </div>
           {bulkMsg && <div className="modal-msg">{bulkMsg}</div>}
+          {bulkPreview && (
+            <div className="bulk-preview" aria-live="polite">
+              {bulkPreview.rows.map(row => (
+                <div key={row.row} className={`bulk-preview-row status-${row.status}`}>
+                  <strong>Row {row.row}: {row.item?.title || 'Invalid resource'}</strong>
+                  {row.issues.map((issue, index) => <span key={`${issue.field}-${index}`}>{issue.field}: {issue.message}</span>)}
+                  {row.status === 'ready' && <span>{row.item.url} · {row.item.science} / {row.item.subdiscipline}</span>}
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       )}
 

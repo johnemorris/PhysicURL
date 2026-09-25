@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import { QUESTIONS, CATALOG, computeKit, kitTotal } from '../lib/chemWizard.js';
-import { addReferralParams } from '../lib/referral.ts';
+import { buildProductPurchaseUrl } from '../lib/referral.ts';
 import ChemLabPreview from './ChemLabPreview.jsx';
 import WizardIntro from './shared/WizardIntro.jsx';
 import WizardQuestionFlow from './shared/WizardQuestionFlow.jsx';
@@ -32,6 +32,7 @@ export default function ChemWizard() {
 
   const kit = useMemo(() => computeKit(answers), [answers]);
   const total = useMemo(() => kitTotal(kit), [kit]);
+  const bundleDestination = buildProductPurchaseUrl(kit.bundle ? CATALOG[kit.bundle]?.url : undefined);
   const complete = answers.user && answers.space && answers.focus && answers.budget;
 
   const onAnswer = (qid, oid) => {
@@ -107,9 +108,11 @@ export default function ChemWizard() {
                 <div className="bundle-sub">Buy the pre-assembled bundle from {CATALOG[kit.bundle].vendor} instead of shopping individually.</div>
               </div>
               <div className="bundle-price">${CATALOG[kit.bundle].price}</div>
-              <a href={addReferralParams(CATALOG[kit.bundle].url)} target="_blank" rel="noopener nofollow sponsored" className="btn-primary">
-                Buy Kit &rarr;
-              </a>
+              {bundleDestination && (
+                <a href={bundleDestination} target="_blank" rel="noopener nofollow sponsored" className="btn-primary" data-product-id={kit.bundle} data-placement="wizard-bundle">
+                  Buy Kit &rarr;
+                </a>
+              )}
             </div>
           )}
         </WizardChecklist>

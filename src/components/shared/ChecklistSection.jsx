@@ -1,4 +1,4 @@
-import { addReferralParams } from '../../lib/referral.ts';
+import { buildProductPurchaseUrl } from '../../lib/referral.ts';
 
 /**
  * ChecklistSection
@@ -10,7 +10,7 @@ import { addReferralParams } from '../../lib/referral.ts';
  * Shared by ChemWizard and AstroWizard so both wizards render checklist rows
  * with identical markup/CSS classes (`.checklist-section`, `.cs-row`, ...),
  * defined once in global.scss. All outbound links go through
- * addReferralParams so affiliate tagging stays consistent everywhere.
+ * buildProductPurchaseUrl so affiliate tagging stays consistent everywhere.
  *
  * Props:
  * - title:  section heading, plain text (e.g. "Mount & Base").
@@ -36,6 +36,7 @@ export default function ChecklistSection({ title, ids, catalog, icon, tone, vend
           const item = catalog[id];
           if (!item) return null;
           const linkLabel = vendorLabel ? `View on ${vendorLabel}` : item.vendor;
+          const destination = buildProductPurchaseUrl(item.url);
           return (
             <div key={id} className="cs-row">
               <div className="cs-name">
@@ -43,9 +44,18 @@ export default function ChecklistSection({ title, ids, catalog, icon, tone, vend
                 {item.spec && <span className="cs-spec">{item.spec}</span>}
               </div>
               <div className="cs-price">${item.price}</div>
-              <a className="cs-link" href={addReferralParams(item.url)} target="_blank" rel="noopener nofollow sponsored">
-                {linkLabel} &rarr;
-              </a>
+              {destination ? (
+                <a
+                  className="cs-link"
+                  href={destination}
+                  target="_blank"
+                  rel="noopener nofollow sponsored"
+                  data-product-id={id}
+                  data-placement="wizard-checklist"
+                >
+                  {linkLabel} &rarr;
+                </a>
+              ) : <span className="cs-link-unavailable">Purchase link unavailable</span>}
             </div>
           );
         })}
