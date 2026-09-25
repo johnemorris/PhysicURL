@@ -31,6 +31,9 @@ export const RESOURCE_TYPE_LABELS: Record<string, string> = {
   organization: 'Organization', book: 'Book', kit: 'Kit', equipment: 'Equipment',
   course: 'Course', video: 'Video', supply: 'Supply',
   portal_lab: 'Portal / Lab',
+  journal_preprint: 'Journal / Preprint', tutorial_course: 'Tutorial / Course',
+  online_tool: 'Online Tool', lab_hardware: 'Laboratory Hardware',
+  university_dept: 'University Department',
 };
 
 export const ACCESS_LABELS: Record<string, string> = {

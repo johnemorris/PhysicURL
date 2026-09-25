@@ -36,7 +36,7 @@ const verifiedCount = subResources.filter(r => r.isVerified).length;
 <DirectoryLayout
   title={`${subdiscipline} — ${science.name}`}
   description={`${subdiscipline} resources within ${science.name}. Browse ${subResources.length} curated links including portals, tools, databases, journals, and educational materials.`}
-  breadcrumb={[{ label: 'PhysicURL', href: '/' }, { label: science.name, href: `/${science.slug}.html` }, { label: subdiscipline }]}
+  breadcrumb={[{ label: 'PhysicURL', href: '/' }, { label: science.name, href: `/${science.slug}` }, { label: subdiscipline }]}
   tree={tree}
   currentPath={`/${science.slug}/${subSlug}`}
   totalCount={subResources.length}

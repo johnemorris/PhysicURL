@@ -7,9 +7,15 @@ export default defineConfig({
   site: "https://physicurl.com",
   trailingSlash: "never",
   build: {
-    format: "file",
+    format: "directory",
   },
-  integrations: [react(), sitemap()],
+  integrations: [
+    react(),
+    sitemap({
+      filter: page => !page.endsWith("/resources-index"),
+      customPages: ["https://physicurl.com/index"],
+    }),
+  ],
   vite: {
     resolve: {
       alias: { "@": "/src" },

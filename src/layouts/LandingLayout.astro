@@ -1,0 +1,91 @@
+---
+import { compile } from 'sass';
+import { readFileSync } from 'fs';
+import { join } from 'path';
+
+interface Props {
+  title: string;
+  description: string;
+  currentPath: string;
+  totalCount: number;
+  image?: string;
+}
+
+const { title, description, currentPath, totalCount, image = '/images/home/einstein-cosmos-base.jpg' } = Astro.props;
+const canonicalUrl = new URL(currentPath, Astro.site ?? 'https://physicurl.com').href;
+const imageUrl = new URL(image, Astro.site ?? 'https://physicurl.com').href;
+const stylesPath = join(process.cwd(), 'src', 'styles', 'landing.scss');
+const cssContent = compile(stylesPath, { style: 'compressed', charset: false }).css.replace(/^\uFEFF/, '');
+const year = new Date().getFullYear();
+---
+
+<!doctype html>
+<html lang="en" data-theme="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{title}</title>
+    <meta name="description" content={description.slice(0, 160)} />
+    <meta name="theme-color" content="#080c14" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description.slice(0, 200)} />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content={canonicalUrl} />
+    <meta property="og:image" content={imageUrl} />
+    <meta property="og:image:alt" content="Albert Einstein, handwritten equations, and Earth against a field of stars" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <link rel="canonical" href={canonicalUrl} />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Kalam:wght@300;400&family=Plus+Jakarta+Sans:wght@500;600;700&display=swap" rel="stylesheet" />
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 28'><circle cx='14' cy='14' r='2' fill='%2338BDF8'/><ellipse cx='14' cy='14' rx='11' ry='4' fill='none' stroke='%2338BDF8' stroke-width='1.5'/><ellipse cx='14' cy='14' rx='11' ry='4' fill='none' stroke='%2338BDF8' stroke-width='1.5' transform='rotate(60 14 14)'/><ellipse cx='14' cy='14' rx='11' ry='4' fill='none' stroke='%2338BDF8' stroke-width='1.5' transform='rotate(120 14 14)'/></svg>" />
+    <style is:global set:html={cssContent}></style>
+  </head>
+  <body>
+    <a class="skip-link" href="#main-content">Skip to content</a>
+    <div class="site-shell">
+      <header class="site-header">
+        <a class="brand" href="/" aria-label="PhysicURL home">
+          <svg width="30" height="30" viewBox="0 0 28 28" fill="none" aria-hidden="true">
+            <circle cx="14" cy="14" r="2" fill="currentColor" />
+            <ellipse cx="14" cy="14" rx="11" ry="4" stroke="currentColor" stroke-width="1.5" />
+            <ellipse cx="14" cy="14" rx="11" ry="4" stroke="currentColor" stroke-width="1.5" transform="rotate(60 14 14)" />
+            <ellipse cx="14" cy="14" rx="11" ry="4" stroke="currentColor" stroke-width="1.5" transform="rotate(120 14 14)" />
+          </svg>
+          <span>PhysicURL</span>
+        </a>
+        <nav class="site-nav" aria-label="Primary navigation">
+          <a href="/#about">About</a>
+          <a href="/#disciplines">Disciplines</a>
+          <a class="nav-primary" href="/index">All Resources</a>
+        </nav>
+      </header>
+
+      <main id="main-content"><slot /></main>
+
+      <footer class="site-footer">
+        <div class="footer-lead">
+          <a class="brand" href="/" aria-label="PhysicURL home">PhysicURL</a>
+          <p>An independent directory for discovering authoritative resources across physics and the natural sciences.</p>
+        </div>
+        <nav aria-label="Footer navigation">
+          <a href="/#about">About</a>
+          <a href="mailto:contact@physicurl.com">Contact</a>
+          <a href="/privacy">Privacy</a>
+          <a href="/disclaimer">Disclaimer</a>
+          <a href="/index">All Resources</a>
+        </nav>
+        <nav aria-label="Science disciplines">
+          <a href="/physics">Physics</a>
+          <a href="/chemistry">Chemistry</a>
+          <a href="/astronomy">Astronomy</a>
+          <a href="/earth-sciences">Earth Sciences</a>
+        </nav>
+        <div class="footer-meta">
+          <p>{totalCount} curated resources · <a href="mailto:contact@physicurl.com">contact@PhysicURL.com</a></p>
+          <p>© {year} PhysicURL. All rights reserved.</p>
+        </div>
+      </footer>
+    </div>
+  </body>
+</html>

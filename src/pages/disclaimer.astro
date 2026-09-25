@@ -1,0 +1,22 @@
+---
+import LandingLayout from '../layouts/LandingLayout.astro';
+import { loadResources } from '../lib/data-node';
+import { AMAZON_ASSOCIATE_DISCLOSURE } from '../lib/referral';
+const totalCount = loadResources().length;
+---
+
+<LandingLayout title="Disclaimer — PhysicURL" description="Important information about PhysicURL's independent scientific resource directory and external links." currentPath="/disclaimer" totalCount={totalCount}>
+  <div class="content-width static-page">
+    <article>
+      <p class="eyebrow">Site information</p>
+      <h1>Disclaimer</h1>
+      <p>PhysicURL is an independent discovery directory. A listing is not an endorsement, and directory descriptions are provided for general informational and educational purposes rather than professional, medical, legal, or safety advice.</p>
+      <h2>External links</h2>
+      <p>Resources are operated by third parties. Their content, availability, accuracy, and practices can change after review. Visitors should evaluate information in context and follow the safety guidance of qualified institutions and professionals.</p>
+      <h2>Affiliate disclosure</h2>
+      <p>{AMAZON_ASSOCIATE_DISCLOSURE} Affiliate links are marked in the directory where applicable.</p>
+      <h2>Corrections</h2>
+      <p>To report a broken link or factual issue, email <a href="mailto:contact@physicurl.com">contact@PhysicURL.com</a>.</p>
+    </article>
+  </div>
+</LandingLayout>

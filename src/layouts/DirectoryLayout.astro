@@ -20,6 +20,7 @@ interface Props {
 }
 
 const { title, description, breadcrumb, tree, currentPath, totalCount, children } = Astro.props;
+const canonicalUrl = new URL(currentPath, Astro.site ?? 'https://physicurl.com').href;
 
 // JSON-LD
 const jsonLd = {
@@ -27,7 +28,7 @@ const jsonLd = {
   '@type': 'CollectionPage',
   name: title,
   description: description.slice(0, 200),
-  url: `https://physicurl.pplx.app${currentPath}`,
+  url: canonicalUrl,
 };
 ---
 
@@ -43,7 +44,8 @@ const jsonLd = {
   <meta property="og:description" content={description.slice(0, 200)} />
   <meta property="og:type" content="website" />
   <meta name="twitter:card" content="summary_large_image" />
-  <link rel="canonical" href={`https://physicurl.pplx.app${currentPath}`} />
+  <meta property="og:url" content={canonicalUrl} />
+  <link rel="canonical" href={canonicalUrl} />
   <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -90,12 +92,12 @@ const jsonLd = {
               >
                 <span class="chevron">▶</span>
               </button>
-              <a href={`/${sci.slug}.html`} class="tree-science-link" style="flex:1">{sci.name}</a>
+              <a href={`/${sci.slug}`} class="tree-science-link" style="flex:1">{sci.name}</a>
               <span class="tree-science-count">{sci.count}</span>
             </div>
             <div class="tree-sub">
               {sci.subdisciplines.map(sub => (
-                <a href={`/${sci.slug}/${sub.slug}.html`} class={currentPath === `/${sci.slug}/${sub.slug}` ? 'active' : ''}>
+                <a href={`/${sci.slug}/${sub.slug}`} class={currentPath === `/${sci.slug}/${sub.slug}` ? 'active' : ''}>
                   {sub.name}
                   <span class="count">{sub.count}</span>
                 </a>
@@ -120,6 +122,7 @@ const jsonLd = {
             </>
           ))}
         </nav>
+        <a class="all-resources-link" href="/index">All Resources</a>
         <div class="topbar-stats">
           <span><span class="stat-value">{totalCount}</span> resources</span>
           <SubmitModal client:load />
@@ -143,9 +146,9 @@ const jsonLd = {
         <p>PhysicURL — Scientific Reference Index & Knowledge Directory | {totalCount} curated resources across 7 scientific fields</p>
         <p style="margin-top:4px;">
           Resources are verified and curated.
-          <a href="/">Browse all sciences</a> |
+          <a href="/index">Browse all resources</a> |
           <a href="#" class="btn btn-primary" style="font-size:12px;padding:4px 12px;">+ Submit a Link</a> |
-          <a href="/admin/">Admin</a>
+          <a href="/admin">Admin</a>
         </p>
         <p class="affiliate-disclaimer">{AMAZON_ASSOCIATE_DISCLOSURE} Amazon affiliate links are marked with an "Affiliate" badge.</p>
       </footer>

@@ -1,0 +1,83 @@
+---
+import DirectoryLayout from '../layouts/DirectoryLayout.astro';
+import { loadResources, loadStatusMap, buildTree, SCIENCES, RESOURCE_TYPE_LABELS, ACCESS_LABELS } from '../lib/data-node';
+import FilterBar from '../components/FilterBar.astro';
+import ResourceRow from '../components/ResourceRow.astro';
+import { isUnderReview, reviewDetails } from '../lib/resource-health';
+
+const resources = loadResources();
+const statusMap = loadStatusMap();
+const tree = buildTree(resources);
+const totalCount = resources.length;
+const byScience: Record<string, typeof resources> = {};
+for (const resource of resources) {
+  if (!byScience[resource.science]) byScience[resource.science] = [];
+  byScience[resource.science].push(resource);
+}
+const verifiedCount = resources.filter(resource => resource.isVerified).length;
+const freeCount = resources.filter(resource => resource.access === 'free' || resource.access === 'open_access').length;
+---
+
+<DirectoryLayout
+  title="All Scientific Resources"
+  description={`Search and filter ${totalCount} curated resources across physics and the natural sciences, including laboratories, journals, databases, simulations, tools, and university programs.`}
+  breadcrumb={[{ label: 'PhysicURL', href: '/' }, { label: 'All Resources' }]}
+  tree={tree}
+  currentPath="/index"
+  totalCount={totalCount}
+>
+  <FilterBar
+    initialCount={totalCount}
+    resourceTypeLabels={RESOURCE_TYPE_LABELS}
+    accessLabels={ACCESS_LABELS}
+    showSearch={true}
+    searchPlaceholder="Search scientific resources..."
+    searchId="directory-search"
+  />
+  <div class="scope-meta directory-summary">
+    <span>
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12" /></svg>
+      {verifiedCount} verified
+    </span>
+    <span>
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10" /><path d="M12 8v4l3 3" /></svg>
+      {freeCount} free / open access
+    </span>
+  </div>
+
+  <div class="resource-list" id="resource-list">
+    {SCIENCES.map(science => {
+      const scienceResources = byScience[science.slug] || [];
+      if (scienceResources.length === 0) return null;
+      const bySubdiscipline = {};
+      for (const resource of scienceResources) {
+        if (!bySubdiscipline[resource.subdiscipline]) bySubdiscipline[resource.subdiscipline] = [];
+        bySubdiscipline[resource.subdiscipline].push(resource);
+      }
+
+      return (
+        <div class="resource-section" data-science={science.slug}>
+          <div class="resource-section-title">{science.name} ({scienceResources.length})</div>
+          {Object.entries(bySubdiscipline).sort((a, b) => b[1].length - a[1].length).map(([subdiscipline, subResources]) => (
+            <div class="resource-subsection" data-subdiscipline={subdiscipline}>
+              <div class="resource-subsection-title">{subdiscipline} ({subResources.length})</div>
+              {[...subResources].sort((a, b) => b.rating - a.rating).map(resource => {
+                const status = statusMap[resource.url];
+                return (
+                  <ResourceRow
+                    resource={{
+                      ...resource,
+                      isUnderReview: isUnderReview(status),
+                      reviewDetails: reviewDetails(status),
+                    }}
+                    accessLabels={ACCESS_LABELS}
+                  />
+                );
+              })}
+            </div>
+          ))}
+        </div>
+      );
+    })}
+  </div>
+</DirectoryLayout>

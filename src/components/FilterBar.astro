@@ -66,6 +66,7 @@ const {
 </div>
 
 <script define:vars={{ searchId }} is:inline>
+  function initializeResourceFilters() {
   const filterAccess = document.getElementById('filter-access');
   const filterType = document.getElementById('filter-type');
   const filterVerified = document.getElementById('filter-verified');
@@ -101,26 +102,30 @@ const {
 
     resultCount.textContent = `${count} resources`;
 
-    // Hide empty sections
+    // Hide empty subsection headings and top-level science sections.
+    document.querySelectorAll('.resource-subsection').forEach(subsection => {
+      const visible = subsection.querySelectorAll('.resource-row:not([style*="none"])').length;
+      subsection.style.display = visible > 0 ? '' : 'none';
+    });
     document.querySelectorAll('.resource-section').forEach(sec => {
       const visible = sec.querySelectorAll('.resource-row:not([style*="none"])').length;
       sec.style.display = visible > 0 ? '' : 'none';
     });
 
-    // Sort
-    if (sort === 'rating' || sort === 'relevance') {
-      document.querySelectorAll('.resource-section').forEach(sec => {
-        const subRows = Array.from(sec.querySelectorAll('.resource-row'));
-        subRows.sort((a, b) => parseFloat(b.dataset.rating) - parseFloat(a.dataset.rating));
-        subRows.forEach(r => sec.appendChild(r));
+    // Sort rows without pulling them out of their science/subdiscipline group.
+    document.querySelectorAll('.resource-section').forEach(sec => {
+      const subsections = Array.from(sec.querySelectorAll(':scope > .resource-subsection'));
+      const groups = subsections.length > 0 ? subsections : [sec];
+      groups.forEach(group => {
+        const groupRows = Array.from(group.querySelectorAll(':scope > .resource-row'));
+        if (sort === 'alphabetical') {
+          groupRows.sort((a, b) => a.dataset.title.localeCompare(b.dataset.title));
+        } else {
+          groupRows.sort((a, b) => parseFloat(b.dataset.rating) - parseFloat(a.dataset.rating));
+        }
+        groupRows.forEach(row => group.appendChild(row));
       });
-    } else if (sort === 'alphabetical') {
-      document.querySelectorAll('.resource-section').forEach(sec => {
-        const subRows = Array.from(sec.querySelectorAll('.resource-row'));
-        subRows.sort((a, b) => a.dataset.title.localeCompare(b.dataset.title));
-        subRows.forEach(r => sec.appendChild(r));
-      });
-    }
+    });
   }
 
   function debouncedApply() {
@@ -130,4 +135,30 @@ const {
 
   [filterAccess, filterType, filterVerified, sortSelect].forEach(el => el.addEventListener('change', applyFilters));
   searchInput?.addEventListener('input', debouncedApply);
+
+  // Directory search is linkable so the landing-page search can hand off to
+  // this single, existing filtering implementation. Unknown parameters are
+  // ignored to preserve referral and analytics URLs.
+  const params = new URLSearchParams(window.location.search);
+  if (searchInput && params.has('q')) searchInput.value = params.get('q') || '';
+  if (params.has('access') && [...filterAccess.options].some(option => option.value === params.get('access'))) {
+    filterAccess.value = params.get('access');
+  }
+  if (params.has('type') && [...filterType.options].some(option => option.value === params.get('type'))) {
+    filterType.value = params.get('type');
+  }
+  if (params.has('verified') && [...filterVerified.options].some(option => option.value === params.get('verified'))) {
+    filterVerified.value = params.get('verified');
+  }
+  if (params.has('sort') && [...sortSelect.options].some(option => option.value === params.get('sort'))) {
+    sortSelect.value = params.get('sort');
+  }
+  if ([...params.keys()].some(key => ['q', 'access', 'type', 'verified', 'sort'].includes(key))) applyFilters();
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initializeResourceFilters, { once: true });
+  } else {
+    initializeResourceFilters();
+  }
 </script>

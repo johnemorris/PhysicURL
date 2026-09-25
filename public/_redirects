@@ -1,0 +1,8 @@
+# /index is the public canonical for the internal static directory artifact.
+# Exact rewrites come before the legacy .html redirects.
+/index               /resources-index  200
+/index/              /resources-index  200
+
+# Preserve the original public .html URLs after adopting directory output.
+/:section/:page.html  /:section/:page  301
+/:page.html           /:page           301

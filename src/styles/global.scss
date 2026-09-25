@@ -297,6 +297,17 @@ ul, ol { list-style: none; }
         .separator { color: var(--color-text-faint); }
       }
 
+      .all-resources-link {
+        color: var(--color-primary);
+        font-size: 12px;
+        font-weight: 600;
+        text-decoration: none;
+        white-space: nowrap;
+
+        &:hover { text-decoration: underline; }
+        &:focus-visible { outline: 2px solid var(--color-primary); outline-offset: 3px; }
+      }
+
       .topbar-stats {
         margin-left: auto;
         display: flex;
@@ -306,6 +317,17 @@ ul, ol { list-style: none; }
         .stat-value { font-weight: 700; color: var(--color-primary); }
         &.stat-warning .stat-value { color: var(--color-amber); }
       }
+    }
+
+    .directory-summary {
+      display: flex;
+      gap: 16px;
+      padding: 8px 24px;
+      border-bottom: 1px solid var(--color-border-light);
+      color: var(--color-text-muted);
+      font-size: 12px;
+
+      span { display: flex; align-items: center; gap: 4px; }
     }
 
     // --- Scope Header ---

@@ -20,26 +20,26 @@ const tree = buildTree(resources);
       <h1>Page Not Found</h1>
       <p class="not-found-message">
         The resource you're looking for doesn't exist or has been moved. 
-        Our directory contains 500+ curated scientific resources across 7 fields — 
+        Our directory contains {resources.length} curated scientific resources across 7 fields —
         it's likely what you need is still here, just at a different URL.
       </p>
       
       <div class="not-found-actions">
-        <a href="/" class="btn btn-primary btn-lg">
+        <a href="/index" class="btn btn-primary btn-lg">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M10 19l-7-7 7-7" />
             <path d="M17 12H7" />
           </svg>
-          Return to Homepage
+          Browse All Resources
         </a>
-        <a href="/sitemap.html" class="btn btn-secondary btn-lg">
+        <a href="/index" class="btn btn-secondary btn-lg">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <rect x="3" y="3" width="7" height="7" rx="1" />
             <rect x="14" y="3" width="7" height="7" rx="1" />
             <rect x="3" y="14" width="7" height="7" rx="1" />
             <rect x="14" y="14" width="7" height="7" rx="1" />
           </svg>
-          Browse Sitemap
+          Search the Directory
         </a>
       </div>
 
@@ -47,7 +47,7 @@ const tree = buildTree(resources);
         <h3>Popular Science Directories</h3>
         <div class="science-quick-links">
           {SCIENCES.map(sci => (
-            <a href={`/${sci.slug}.html`} class="quick-link" data-science={sci.slug}>
+            <a href={`/${sci.slug}`} class="quick-link" data-science={sci.slug}>
               <span class="quick-link-icon">{sci.icon === 'atom' && '⚛' || sci.icon === 'flask' && '⚗' || sci.icon === 'telescope' && '🔭' || sci.icon === 'globe' && '🌍' || sci.icon === 'dna' && '🧬' || sci.icon === 'crystal' && '💎' || sci.icon === 'sigma' && 'Σ'}</span>
               <span class="quick-link-name">{sci.name}</span>
             </a>
@@ -56,7 +56,7 @@ const tree = buildTree(resources);
       </div>
 
       <div class="not-found-search">
-        <form action="/search" method="GET" class="search-form">
+        <form action="/index" method="GET" class="search-form">
           <label for="search-q" class="visually-hidden">Search resources</label>
           <input 
             type="search" 

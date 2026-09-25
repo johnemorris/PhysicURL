@@ -1,90 +1,217 @@
 ---
-import DirectoryLayout from '../layouts/DirectoryLayout.astro';
-import { loadResources, loadStatusMap, buildTree, SCIENCES, RESOURCE_TYPE_LABELS, ACCESS_LABELS } from '../lib/data-node';
-import FilterBar from '../components/FilterBar.astro';
-import ResourceRow from '../components/ResourceRow.astro';
-import { isUnderReview, reviewDetails } from '../lib/resource-health';
+import LandingLayout from '../layouts/LandingLayout.astro';
+import EarthGlobe from '../components/EarthGlobe.astro';
+import { loadResources, SCIENCES, RESOURCE_TYPE_LABELS } from '../lib/data-node';
+import { featuredScientist } from '../lib/featuredScientists';
 
 const resources = loadResources();
-const statusMap = loadStatusMap();
-const tree = buildTree(resources);
 const totalCount = resources.length;
+const quote = featuredScientist.quote;
+const availableResourceTypes = new Set(resources.map(resource => resource.resourceType));
+const resourceTypes = ['portal_lab', 'journal_preprint', 'tutorial_course', 'online_tool', 'database', 'university_dept', 'reference', 'organization']
+  .filter(type => availableResourceTypes.has(type))
+  .map(type => RESOURCE_TYPE_LABELS[type]);
 
-// Group resources by science for the homepage
-const byScience = {};
-for (const r of resources) {
-  if (!byScience[r.science]) byScience[r.science] = [];
-  byScience[r.science].push(r);
-}
+const cardDescriptions: Record<string, string> = {
+  physics: 'Matter, energy, motion, forces, space, time, and the laws connecting them.',
+  chemistry: 'The composition, structure, properties, and transformations of matter.',
+  astronomy: 'Stars, planets, galaxies, observatories, missions, and the evolving universe.',
+  'earth-sciences': 'Geology, oceans, atmosphere, climate, and the changing Earth system.',
+  biophysics: 'Physical principles applied to molecules, cells, organisms, and living systems.',
+  'materials-science': 'How structure creates the electrical, mechanical, and optical behavior of materials.',
+  'mathematical-physics': 'Mathematical structures, computation, and models that express physical law.',
+};
 
-const verifiedCount = resources.filter(r => r.isVerified).length;
-const freeCount = resources.filter(r => r.access === 'free' || r.access === 'open_access').length;
+const cardAlt: Record<string, string> = {
+  physics: 'A particle detector illuminated by traces of particle collisions',
+  chemistry: 'Laboratory glassware, molecular structures, and crystals',
+  astronomy: 'An observatory beneath a field of stars and a distant nebula',
+  'earth-sciences': 'Mountains, ocean, and atmospheric systems seen from orbit',
+  biophysics: 'A protein structure beside a cell viewed through microscopy',
+  'materials-science': 'Graphene layers and crystalline metallic microstructures',
+  'mathematical-physics': 'Tensor equations and a curved spacetime surface',
+};
+
+const structuredData = {
+  '@context': 'https://schema.org',
+  '@type': 'WebSite',
+  name: 'PhysicURL',
+  url: 'https://physicurl.com/',
+  description: 'An independent curated directory for authoritative physics and natural-science resources.',
+  potentialAction: {
+    '@type': 'SearchAction',
+    target: 'https://physicurl.com/index?q={search_term_string}',
+    'query-input': 'required name=search_term_string',
+  },
+};
 ---
 
-<DirectoryLayout 
-  title="PhysicURL"
-  description="An authoritative scientific reference directory indexing 500+ curated physics and natural science resources — laboratories, journals, simulators, databases, and university departments worldwide."
-  breadcrumb={[{ label: 'PhysicURL' }]}
-  tree={tree}
+<LandingLayout
+  title="PhysicURL — Discover Physics and Natural Science Resources"
+  description={`Discover ${totalCount} curated scientific resources across physics, chemistry, astronomy, Earth sciences, biophysics, materials science, and mathematical physics.`}
   currentPath="/"
   totalCount={totalCount}
 >
-  <FilterBar 
-    initialCount={totalCount}
-    resourceTypeLabels={RESOURCE_TYPE_LABELS}
-    accessLabels={ACCESS_LABELS}
-    showSearch={false}
-  />
-  <div class="scope-meta" style="padding: 8px 24px; border-bottom: 1px solid var(--color-border-light);">
-    <span>
-      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
-      {verifiedCount} verified
-    </span>
-    <span>
-      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
-      {freeCount} free / open access
-    </span>
+  <script type="application/ld+json" set:html={JSON.stringify(structuredData)} />
+
+  <section class="hero" id="discover" aria-labelledby="hero-title">
+    <img class="hero-base" src="/images/home/einstein-cosmos-base.jpg" alt="Albert Einstein writing among handwritten physics equations, stars, and galaxies" width="2048" height="768" fetchpriority="high" decoding="async" />
+
+    <EarthGlobe />
+    <button class="pen-trigger" id="pen-trigger" type="button" aria-label="Reveal Einstein's equation dream" aria-pressed="false"></button>
+
+    <div class="hero-content">
+      <div class="hero-copy">
+        <p class="eyebrow">A universe of useful knowledge</p>
+        <h1 id="hero-title">Discover the science behind the universe.</h1>
+        <p class="summary">PhysicURL is an independent, curated gateway to authoritative resources across physics and the natural sciences.</p>
+
+        <form class="hero-search" action="/index" method="get" role="search">
+          <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8" /><path d="m21 21-4.3-4.3" /></svg>
+          <label class="sr-only" for="hero-search">Search scientific resources</label>
+          <input id="hero-search" name="q" type="search" placeholder="Search scientific resources..." autocomplete="off" />
+          <button type="submit">Search</button>
+        </form>
+
+        <div class="quote">
+          <p class="quote-label">QUOTE OF THE DAY</p>
+          <blockquote>“{quote.text}”</blockquote>
+          <cite>{quote.attribution}</cite>
+        </div>
+      </div>
+    </div>
+    <div class="hero-fade" aria-hidden="true"></div>
+  </section>
+
+  <div class="equation-dream" id="equation-dream" aria-hidden="true">
+    <span class="dream-equation">G<sub>μν</sub> + Λg<sub>μν</sub> = 8πG T<sub>μν</sub> / c⁴</span>
+    <span class="dream-equation">iℏ ∂ψ/∂t = Ĥψ</span>
+    <span class="dream-equation">E² = (pc)² + (mc²)²</span>
+    <span class="dream-equation">∇ · E = ρ / ε₀</span>
+    <span class="dream-equation">S = k<sub>B</sub> ln Ω</span>
   </div>
 
-  <div class="resource-list" id="resource-list">
-    {SCIENCES.map(sci => {
-      const sciResources = byScience[sci.slug] || [];
-      if (sciResources.length === 0) return null;
-      
-      // Group by subdiscipline
-      const bySub = {};
-      for (const r of sciResources) {
-        if (!bySub[r.subdiscipline]) bySub[r.subdiscipline] = [];
-        bySub[r.subdiscipline].push(r);
-      }
-      
-      return (
-        <div class="resource-section" data-science={sci.slug}>
-          <div class="resource-section-title">{sci.name} ({sciResources.length})</div>
-          {Object.entries(bySub).sort((a, b) => b[1].length - a[1].length).map(([subName, subResources]) => {
-            const sorted = [...subResources].sort((a, b) => b.rating - a.rating);
-            return (
-                <div class="resource-subsection" data-subdiscipline={subName}>
-                  <div class="resource-subsection-title">{subName} ({subResources.length})</div>
-                {sorted.map(r => {
-                  const status = statusMap[r.url];
-                  const underReview = isUnderReview(status);
-                  return (
-                    <ResourceRow
-                      resource={{
-                        ...r,
-                        isUnderReview: underReview,
-                        reviewDetails: reviewDetails(status),
-                      }}
-                      accessLabels={ACCESS_LABELS}
-                    />
-                  );
-                })}
-              </div>
-            );
-          })}
-        </div>
-      );
-    })}
+  <div class="journey-shell">
+    <nav class="journey-rail" aria-label="On this page">
+      <p>Discover</p>
+      <a href="#about">PhysicURL</a>
+      <a href="#physics">Physics</a>
+      <a href="#natural-sciences">Natural sciences</a>
+      <a href="#disciplines">Disciplines</a>
+      <a href="#all-resources">All resources</a>
+    </nav>
+    <div class="journey-content">
+
+  <section class="editorial-section" id="about" aria-labelledby="about-title">
+    <div class="content-width intro-grid">
+      <div>
+        <p class="eyebrow">Purpose</p>
+        <h2 id="about-title">What is PhysicURL?</h2>
+      </div>
+      <div class="prose">
+        <p><strong>PhysicURL is an independent curated science-resource directory.</strong> It helps students, educators, researchers, and curious readers find useful, authoritative places to learn, investigate, calculate, simulate, and explore.</p>
+        <p>Every listing belongs to a real scientific discipline and resource type already represented in the directory. Rather than flattening the web into an undifferentiated list, PhysicURL organizes resources by field and subdiscipline so visitors can follow a question into the part of science best equipped to answer it.</p>
+        <ul class="resource-kinds" aria-label="Resource types in the PhysicURL directory">
+          {resourceTypes.map(type => <li>{type}</li>)}
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="editorial-section physics-section" id="physics" aria-labelledby="physics-title">
+    <div class="content-width">
+      <p class="eyebrow">Foundations</p>
+      <h2 id="physics-title">What is physics?</h2>
+      <p class="lede">Physics is the study of matter, energy, motion, forces, space, and time—and of the fundamental rules that connect them. It asks how nature behaves at scales ranging from subatomic particles to galaxies and the universe as a whole.</p>
+
+      <div class="concept-grid">
+        <article>
+          <h3>Motion, forces, and fields</h3>
+          <p><a href="/physics/classical-mechanics">Classical mechanics</a> describes motion and the forces that change it. <a href="/physics/electromagnetism">Electromagnetism</a> explains electric charge, magnetic fields, light, and much of the technology woven into daily life.</p>
+        </article>
+        <article>
+          <h3>Energy, heat, and collective behavior</h3>
+          <p><a href="/physics/thermodynamics">Thermodynamics</a> connects heat, work, energy, and entropy. <a href="/physics/condensed-matter">Condensed matter physics</a> studies how enormous groups of atoms produce phases and properties such as conductivity, magnetism, and superconductivity.</p>
+        </article>
+        <article>
+          <h3>Atoms, nuclei, and quantum rules</h3>
+          <p><a href="/physics/quantum-mechanics">Quantum mechanics</a> describes nature where probabilities, wave behavior, and discrete energy levels become unavoidable. <a href="/physics/nuclear-physics">Nuclear physics</a> examines atomic nuclei, radiation, decay, fusion, and fission.</p>
+        </article>
+        <article>
+          <h3>Space, time, and the cosmos</h3>
+          <p>Relativity treats space and time as a connected geometry shaped by matter and energy. <a href="/astronomy/astrophysics-cosmology">Astrophysics and cosmology</a> use those ideas—along with mechanics, electromagnetism, and quantum physics—to study stars, black holes, galaxies, and cosmic history.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="editorial-section" id="natural-sciences" aria-labelledby="connections-title">
+    <div class="content-width connections">
+      <p class="eyebrow">Connections</p>
+      <h2 id="connections-title">How does physics connect to the natural sciences?</h2>
+      <p class="lede">The natural sciences study the physical world from different but overlapping scales. Physics supplies foundational laws and measurement methods; other disciplines apply, test, and extend them in systems with their own structures and emergent behavior.</p>
+
+      <div class="connections-list">
+        <article class="connection"><h3>Physics and chemistry</h3><p><a href="/chemistry">Chemistry</a> studies substances, bonding, reactions, and molecular change. Quantum physics explains electron structure and chemical bonds, while thermodynamics and statistical mechanics explain why reactions proceed and how matter changes phase.</p></article>
+        <article class="connection"><h3>Physics and astronomy</h3><p><a href="/astronomy">Astronomy</a> observes celestial objects; astrophysics uses physical laws to explain them. Light reveals temperature, motion, and composition, while gravity governs orbits, stellar systems, galaxies, and the large-scale universe.</p></article>
+        <article class="connection"><h3>Biophysics</h3><p><a href="/biophysics">Biophysics</a> applies mechanics, thermodynamics, electromagnetism, and statistical methods to living systems—from protein folding and molecular motors to membranes, tissues, and biomechanics.</p></article>
+        <article class="connection"><h3>Materials science</h3><p><a href="/materials-science">Materials science</a> connects atomic structure and collective physical behavior to useful properties. It explains how crystals, polymers, semiconductors, nanomaterials, and composites respond to force, heat, light, and electricity.</p></article>
+        <article class="connection"><h3>Mathematical physics</h3><p><a href="/mathematical-physics">Mathematical physics</a> develops the precise language and methods used to formulate physical theories, solve models, analyze symmetry, and connect abstract structures to measurable phenomena.</p></article>
+      </div>
+    </div>
+  </section>
+
+  <section class="editorial-section discipline-section" id="disciplines" aria-labelledby="disciplines-title">
+    <div class="content-width">
+      <div class="discipline-heading">
+        <div><p class="eyebrow">Choose a direction</p><h2 id="disciplines-title">Explore the sciences.</h2></div>
+        <p>Seven connected fields, each opening into curated subdisciplines, tools, databases, organizations, and learning resources.</p>
+      </div>
+
+      <div class="discipline-grid">
+        {SCIENCES.map(science => (
+          <a class="discipline-card" href={`/${science.slug}`}>
+            <span class="card-art" role="img" aria-label={cardAlt[science.slug]}></span>
+            <span class="card-content"><h3>{science.name}</h3><p>{cardDescriptions[science.slug]}</p><span class="card-arrow" aria-hidden="true">Explore →</span></span>
+          </a>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="content-width cta" id="all-resources" aria-labelledby="cta-title">
+    <div><p class="eyebrow">Ready to explore?</p><h2 id="cta-title">Follow your curiosity.</h2><p>Browse all {totalCount} curated scientific resources across physics and the natural sciences.</p></div>
+    <a class="text-link" href="/index">Explore All Resources <span aria-hidden="true">→</span></a>
+  </section>
+    </div>
   </div>
-</DirectoryLayout>
+
+  <script is:inline>
+    const directoryParams = ['q', 'access', 'type', 'verified', 'sort'];
+    const incomingParams = new URLSearchParams(window.location.search);
+    if (directoryParams.some(key => incomingParams.has(key))) window.location.replace(`/index?${incomingParams.toString()}`);
+
+    const earthTrigger = document.getElementById('earth-trigger');
+    const earthVoid = document.getElementById('earth-void');
+    const penTrigger = document.getElementById('pen-trigger');
+
+    function setEarthOpen(open) {
+      document.body.classList.toggle('earth-open', open);
+      earthTrigger?.setAttribute('aria-expanded', String(open));
+      earthTrigger?.setAttribute('aria-label', open ? 'Close immersive Earth view' : 'Open immersive Earth view');
+    }
+    function setEquationsOpen(open) {
+      document.body.classList.toggle('equations-open', open);
+      penTrigger?.setAttribute('aria-pressed', String(open));
+      penTrigger?.setAttribute('aria-label', open ? "Dismiss Einstein's equation dream" : "Reveal Einstein's equation dream");
+    }
+    earthTrigger?.addEventListener('click', () => setEarthOpen(!document.body.classList.contains('earth-open')));
+    earthVoid?.addEventListener('click', () => setEarthOpen(false));
+    penTrigger?.addEventListener('click', () => setEquationsOpen(!document.body.classList.contains('equations-open')));
+    document.addEventListener('keydown', event => {
+      if (event.key !== 'Escape') return;
+      if (document.body.classList.contains('earth-open')) { setEarthOpen(false); earthTrigger?.focus(); }
+      if (document.body.classList.contains('equations-open')) { setEquationsOpen(false); penTrigger?.focus(); }
+    });
+  </script>
+</LandingLayout>

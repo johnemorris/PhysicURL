@@ -1,0 +1,21 @@
+---
+import LandingLayout from '../layouts/LandingLayout.astro';
+import { loadResources } from '../lib/data-node';
+const totalCount = loadResources().length;
+---
+
+<LandingLayout title="Privacy — PhysicURL" description="How PhysicURL handles information when you browse the science resource directory." currentPath="/privacy" totalCount={totalCount}>
+  <div class="content-width static-page">
+    <article>
+      <p class="eyebrow">Site information</p>
+      <h1>Privacy</h1>
+      <p>PhysicURL is designed to be browsed without creating an account. The public directory does not ask visitors for personal information simply to search or follow resource links.</p>
+      <h2>Technical information</h2>
+      <p>Like most websites, the hosting service may process limited technical information needed to deliver and secure the site, such as request times, browser details, referring pages, and network addresses. PhysicURL does not sell personal information.</p>
+      <h2>External resources</h2>
+      <p>Links in the directory lead to independent websites with their own privacy practices. Review those sites’ policies before providing them with personal information.</p>
+      <h2>Questions</h2>
+      <p>Questions about privacy can be sent to <a href="mailto:contact@physicurl.com">contact@PhysicURL.com</a>.</p>
+    </article>
+  </div>
+</LandingLayout>
